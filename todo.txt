@@ -1,0 +1,3 @@
+parser -> watson JSON to JIRA JSON, separate logs based on tags
+script to pull watson report and invoke parser
+display info-to-send to user, ask for confirmation 
