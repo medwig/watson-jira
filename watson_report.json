@@ -1,0 +1,84 @@
+{
+    "projects": [
+        {
+            "name": "1-on-1", 
+            "tags": [
+                {
+                    "name": "Joel", 
+                    "time": 1352.0
+                }
+            ], 
+            "time": 1352.0
+        }, 
+        {
+            "name": "Backlog Sizing", 
+            "tags": [], 
+            "time": 1484.0
+        }, 
+        {
+            "name": "CI-1128", 
+            "tags": [
+                {
+                    "name": "add static S3 image", 
+                    "time": 279.0
+                }, 
+                {
+                    "name": "add static S3 images", 
+                    "time": 1470.0
+                }, 
+                {
+                    "name": "django", 
+                    "time": 2562.0
+                }, 
+                {
+                    "name": "make image comparison template", 
+                    "time": 813.0
+                }
+            ], 
+            "time": 2562.0
+        }, 
+        {
+            "name": "OO-762", 
+            "tags": [
+                {
+                    "name": "check template", 
+                    "time": 170.0
+                }, 
+                {
+                    "name": "cloudformation", 
+                    "time": 170.0
+                }
+            ], 
+            "time": 170.0
+        }, 
+        {
+            "name": "Watson-Jira", 
+            "tags": [], 
+            "time": 4.0
+        }, 
+        {
+            "name": "blocked", 
+            "tags": [
+                {
+                    "name": "bluetooth", 
+                    "time": 676.0
+                }, 
+                {
+                    "name": "headphones", 
+                    "time": 676.0
+                }
+            ], 
+            "time": 676.0
+        }, 
+        {
+            "name": "break", 
+            "tags": [], 
+            "time": 2307.0
+        }
+    ], 
+    "time": 8555.0, 
+    "timespan": {
+        "from": "2018-11-29T00:00:00-05:00", 
+        "to": "2018-11-29T23:59:59.999999-05:00"
+    }
+}
