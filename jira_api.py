@@ -3,25 +3,32 @@ from datetime import datetime
 from jira import JIRA
 
 
-jira = JIRA({'server':'https://skywatch.atlassian.net'})
-uname = 'jon@skywatch.co'
-password = 'WJmIkdCTHsQhq61BOjEl5102'
-server = 'https://skywatch.atlassian.net'
+# credentials are stored in ~/.netrc
+jira = JIRA({'server': 'https://skywatch.atlassian.net'})
+
 issue = 'OO-762'
 time_spent = '1.5m'
 comment = 'comment_test_test'
 started = datetime(2006, 11, 21, 16, 30)
 
-#jira = JIRA(basic_auth=(uname, password), options={'server': server})
 
-issue = jira.issue(issue)
-for worklog in issue.fields.worklog.worklogs:
-    pprint(vars(worklog))
-# pprint(dir(jira))
-#wl = jira.add_worklog(
-#    issue,
-#    timeSpent=time_spent,
-#    comment=comment,
-#    started=started
-#)
-#print(wl)
+def get_worklogs(issue):
+    issue = jira.issue(issue)
+    worklogs = issue.fields.worklog.worklogs
+    for worklog in worklogs:
+        print(worklog.started, worklog.timeSpent, worklog.comment)
+    return worklogs
+
+
+def add_worklog(issue, time_spent, comment, started):
+    wl = jira.add_worklog(
+        issue,
+        timeSpent=time_spent,
+        comment=comment,
+        started=started
+    )
+    return wl
+
+
+if __name__ == '__main__':
+    get_worklogs(issue)
