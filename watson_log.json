@@ -1,0 +1,116 @@
+[
+    {
+        "id": "85769d5bed1643fdb8814659222f35c7", 
+        "project": "CI-1128", 
+        "start": "2018-11-29T13:02:08-05:00", 
+        "stop": "2018-11-29T13:06:47-05:00", 
+        "tags": [
+            "django", 
+            "add static S3 image"
+        ]
+    }, 
+    {
+        "id": "beb24779839649da8aee2abcc1c2b421", 
+        "project": "blocked", 
+        "start": "2018-11-29T13:06:54-05:00", 
+        "stop": "2018-11-29T13:18:10-05:00", 
+        "tags": [
+            "headphones", 
+            "bluetooth"
+        ]
+    }, 
+    {
+        "id": "850ccd4fe4d84a8085d241058416ac98", 
+        "project": "CI-1128", 
+        "start": "2018-11-29T13:18:12-05:00", 
+        "stop": "2018-11-29T13:42:42-05:00", 
+        "tags": [
+            "django", 
+            "add static S3 images"
+        ]
+    }, 
+    {
+        "id": "16e01e7bc9344d0287e10d5eafbf1230", 
+        "project": "CI-1128", 
+        "start": "2018-11-29T13:43:13-05:00", 
+        "stop": "2018-11-29T13:56:46-05:00", 
+        "tags": [
+            "django", 
+            "make image comparison template"
+        ]
+    }, 
+    {
+        "id": "cd5e972d87e54f509ded6698141fe138", 
+        "project": "1-on-1", 
+        "start": "2018-11-29T13:57:28-05:00", 
+        "stop": "2018-11-29T14:20:00-05:00", 
+        "tags": [
+            "Joel"
+        ]
+    }, 
+    {
+        "id": "d45e0b81fdac44f2bce11bc1391bbbf4", 
+        "project": "break", 
+        "start": "2018-11-29T14:20:07-05:00", 
+        "stop": "2018-11-29T14:39:36-05:00", 
+        "tags": []
+    }, 
+    {
+        "id": "c8789ec2bc144c96af509e74f50f51a8", 
+        "project": "OO-762", 
+        "start": "2018-11-29T14:40:29-05:00", 
+        "stop": "2018-11-29T14:43:19-05:00", 
+        "tags": [
+            "cloudformation", 
+            "check template"
+        ]
+    }, 
+    {
+        "id": "a36fab1e3ea74a35bdee9cbf6e32745f", 
+        "project": "break", 
+        "start": "2018-11-29T14:43:23-05:00", 
+        "stop": "2018-11-29T15:02:21-05:00", 
+        "tags": []
+    }, 
+    {
+        "id": "ec44b901613f462fba91cb38e310a8bb", 
+        "project": "Backlog Sizing", 
+        "start": "2018-11-29T15:02:46-05:00", 
+        "stop": "2018-11-29T15:27:30-05:00", 
+        "tags": []
+    }, 
+    {
+        "id": "653f41ed8a664edd993dee24de083baf", 
+        "project": "Watson-Jira", 
+        "start": "2018-11-29T16:08:54-05:00", 
+        "stop": "2018-11-29T16:08:58-05:00", 
+        "tags": []
+    }, 
+    {
+        "id": "c4b44d3276494f1abb1bb0154394f0a7", 
+        "project": "Watson-Jira", 
+        "start": "2018-11-29T16:10:19-05:00", 
+        "stop": "2018-11-29T16:17:53-05:00", 
+        "tags": [
+            "extract a sample Watson frame"
+        ]
+    }, 
+    {
+        "id": "f912d244340d4a8f85156f136c6e409d", 
+        "project": "study", 
+        "start": "2018-11-29T16:18:29-05:00", 
+        "stop": "2018-11-29T16:21:22-05:00", 
+        "tags": [
+            "cli unit converter"
+        ]
+    }, 
+    {
+        "id": "09e0e8698ab046398a851bae4128c91d", 
+        "project": "study", 
+        "start": "2018-11-29T17:10:06-05:00", 
+        "stop": "2018-11-29T17:40:06-05:00", 
+        "tags": [
+            "googler"
+        ]
+    }
+]
