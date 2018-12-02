@@ -16,9 +16,10 @@ def delta_seconds(start, stop):
     return delta.seconds
 
 
-def parse_frames(frames):
+def parse_frames(frames_str):
     """Convert jira frame dictionaries to JIRA worklog dictionaries"""
     worklogs = []
+    frames = json.loads(frames_str)
     for frame in frames:
         if not is_jira_issue(frame['project']):
             continue
@@ -34,7 +35,7 @@ def parse_frames(frames):
 
 if __name__ == '__main__':
     with open('watson_log.json', 'r') as f:
-        was_log = json.load(f)
+        was_log = f.read()
     worklogs = parse_frames(was_log)
     for w in worklogs:
         print(w)
