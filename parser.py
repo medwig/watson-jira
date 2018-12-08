@@ -1,7 +1,9 @@
 # Parser - reads a Watson json report and prints a worklog report
 import json
 import re
+import pprint
 from dateutil import parser
+from subprocess import Popen, PIPE
 
 
 def is_jira_issue(string):
@@ -33,9 +35,20 @@ def parse_frames(frames_str):
     return worklogs
 
 
+def report_day(date):
+    """Get Watson report for a given date in JSON"""
+    process = Popen(['watson', 'report', '--from', date, '--to', date,
+                     '--json'], stdout=PIPE, stderr=PIPE)
+    # cmd = process.args
+    stdout, stderr = process.communicate()
+    report = json.loads(stdout.decode('ascii').strip())
+    return report
+
+
 if __name__ == '__main__':
     with open('watson_log.json', 'r') as f:
         was_log = f.read()
     worklogs = parse_frames(was_log)
-    for w in worklogs:
-        print(w)
+    date = '2018-12-08'
+    report = report_day(date)
+    pprint.pprint(report)
