@@ -1,26 +1,31 @@
-import sys
-import subprocess
-import pprint
+import json
 
-import frame_parser
-import jira_api
+import click
 
-"""
-Captures all arguments and passes them along to `Watson log --json`.
-"""
-args = ' '.join(sys.argv[1:])  # remove the name of the cli command itself
-bash_cmd = "watson log --json {0}".format(args)
-process = subprocess.Popen(bash_cmd.split(), stdout=subprocess.PIPE)
-output, error = process.communicate()
-frames = output.decode('ascii')
+from src import watson
 
-print(bash_cmd)
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-local_worklogs = frame_parser.report_to_worklogs(frames)
-# print(local_worklogs)
 
-wl = local_worklogs[0]
-jira_worklogs = jira_api.get_worklogs(wl['issue'])
-pprint.pprint(wl)
-print('='*100)
-pprint.pprint(jira_worklogs)
+@click.group(context_settings=CONTEXT_SETTINGS)
+@click.version_option(version='1.0.0')
+def greet():
+    pass
+
+
+@greet.command()
+@click.option('--date', default='None', help='date to get logs')
+@click.option('--jira-only', is_flag=True, help='only return logs for Jira issues')
+@click.option('--tempo-format', is_flag=True, help='format logs for tempo timesheet')
+def logs(**kwargs):
+    date = kwargs['date']
+    jira_only = kwargs['jira_only']
+    logs = watson.report_day(date, jira_only)
+
+    if kwargs['tempo_format']:
+        logs = watson.report_to_worklogs(logs)
+
+    print(json.dumps(logs))
+
+if __name__ == '__main__':
+    greet()
