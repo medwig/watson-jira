@@ -1,4 +1,7 @@
 from datetime import datetime
+from dateutil import parser
+import json
+
 from jira import JIRA
 
 
@@ -7,9 +10,8 @@ jira = JIRA({'server': 'https://skywatch.atlassian.net'})
 
 
 def get_worklogs(issue):
-    issue = jira.issue(issue)
-    worklogs = issue.fields.worklog.worklogs
-    jira_worklogs = []
+    worklogs = jira.worklogs(issue)
+    parsed_worklogs = []
     for worklog in worklogs:
         wl = {
             'issue': issue,
@@ -17,8 +19,8 @@ def get_worklogs(issue):
             'started': worklog.started,
             'timeSpent': worklog.timeSpent
         }
-        jira_worklogs.append(wl)
-    return jira_worklogs
+        parsed_worklogs.append(wl)
+    return parsed_worklogs
 
 
 def add_worklog(issue, time_spent, comment, started):
@@ -31,8 +33,10 @@ def add_worklog(issue, time_spent, comment, started):
     return wl
 
 
-def worklog_exists_in_jira(worklog):
-    pass
+def worklog_exists_in_jira(local_worklog):
+    jira_worklogs = get_worklogs(worklog.issue)
+    date = parser(local_worklog['started'])
+
 
 
 def add_all_worklogs(worklogs):
@@ -49,8 +53,11 @@ def add_all_worklogs(worklogs):
 
 
 if __name__ == '__main__':
-    issue = 'OO-762'
+    issue = 'OO-642'
     time_spent = '1.5m'
     comment = 'comment_test_test'
     started = datetime(2006, 11, 21, 16, 30)
-    print(get_worklogs(issue))
+    wls = get_worklogs(issue)
+    print(json.dumps(wls))
+    #  r = add_worklog(issue, time_spent, comment, started)
+    #  print(r)

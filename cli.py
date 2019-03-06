@@ -2,7 +2,7 @@ import sys
 import subprocess
 import pprint
 
-import parser
+import frame_parser
 import jira_api
 
 """
@@ -16,7 +16,7 @@ frames = output.decode('ascii')
 
 print(bash_cmd)
 
-local_worklogs = parser.parse_frames(frames)
+local_worklogs = frame_parser.report_to_worklogs(frames)
 # print(local_worklogs)
 
 wl = local_worklogs[0]
