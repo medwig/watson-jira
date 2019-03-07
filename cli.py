@@ -1,8 +1,10 @@
 import json
 
 import click
+import simplejson
 
 from src import watson
+from src import jira
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -11,6 +13,20 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.version_option(version='1.0.0')
 def greet():
     pass
+
+@greet.command()
+@click.option('--issue', default=None, help='get worklogs from this issue')
+@click.option('--id', default=None, help='get specific worklog by id')
+# @click.option('--tempo-format', is_flag=True, help='format logs for tempo timesheet')
+def tempo(**kwargs):
+    issue = kwargs['issue']
+    _id = kwargs['id']
+    if _id:
+        worklogs = jira.get_worklog(issue, _id)
+    else:
+        worklogs = jira.get_worklogs(issue)
+
+    print(simplejson.dumps(worklogs, skipkeys=True))
 
 
 @greet.command()

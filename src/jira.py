@@ -8,6 +8,10 @@ from jira import JIRA
 # credentials are stored in ~/.netrc
 jira = JIRA({'server': 'https://skywatch.atlassian.net'})
 
+def get_worklog(issue, _id):
+    worklog = jira.worklog(issue, _id)
+    return vars(worklog)
+
 
 def get_worklogs(issue):
     worklogs = jira.worklogs(issue)
@@ -17,7 +21,8 @@ def get_worklogs(issue):
             'issue': issue,
             'comment': worklog.comment,
             'started': worklog.started,
-            'timeSpent': worklog.timeSpent
+            'timeSpent': worklog.timeSpent,
+            'id': worklog.id
         }
         parsed_worklogs.append(wl)
     return parsed_worklogs
