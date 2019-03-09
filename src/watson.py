@@ -20,7 +20,7 @@ def filter_jiras(report):
 
 def report_to_worklogs(report):
     """Convert watson report to Tempo (Jira) worklog dictionaries"""
-    date = report['timespan']['from']
+    date = report['timespan']['to']
     worklogs = []
     for project in report['projects']:
         for tag in project['tags']:
@@ -28,7 +28,7 @@ def report_to_worklogs(report):
                 'issue': project['name'],
                 'started': date,
                 'comment': tag['name'],
-                'timeSpent': tag['time']
+                'timeSpent': tag['time'] // 60 or 1  # Watson logs in seconds, Jira in minutes
             }
             worklogs.append(worklog)
     return worklogs
