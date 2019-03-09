@@ -1,5 +1,5 @@
 from datetime import datetime
-from dateutil import parser
+from dateutil.parser import parse
 import json
 
 from jira import JIRA
@@ -28,12 +28,12 @@ def get_worklogs(issue):
     return parsed_worklogs
 
 
-def add_worklog(issue, time_spent, comment, started):
+def add_worklog(issue, timeSpent, comment, started):
     wl = jira.add_worklog(
         issue,
-        timeSpent=time_spent,
+        timeSpent=timeSpent,
         comment=comment,
-        started=started
+        started=parse(started)
     )
     return wl
 
