@@ -28,7 +28,7 @@ def report_to_worklogs(report):
                 'issue': project['name'],
                 'started': date,
                 'comment': tag['name'],
-                'timeSpent': tag['time'] // 60 or 1  # Watson logs in seconds, Jira in minutes
+                'timeSpent': int(tag['time'] // 60 or 1)  # Watson logs in seconds, Jira in minutes
             }
             worklogs.append(worklog)
     return worklogs

@@ -40,6 +40,7 @@ def sync(**kwargs):
 
     for log in logs:
         worklogs = jira.get_worklogs(log['issue'])
+        print(log['issue'], log['timeSpent'], log['comment'])
         if any([log['comment'] == wl['comment'] for wl in worklogs]):
             # Log already exists in Jira worklogs
             print('Log already exists')
