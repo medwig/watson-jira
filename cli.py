@@ -25,6 +25,19 @@ def to_ymd(datestring):
     return datestring.split('T')[0]
 
 
+def sync_logs(logs, date):
+    for log in logs:
+        worklogs = jira.get_worklogs(log['issue'])
+        print(Fore.YELLOW + Style.NORMAL + f"{log['issue']}, {log['timeSpent']}, {log['comment']}")
+        if any([log['comment'] == wl['comment'] for wl in worklogs]):
+            print('Log already exists')
+        else:
+            jira.add_worklog(**log)
+            print('synced log')
+        print()
+    return True
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version='1.0.0')
 def greet():
@@ -40,18 +53,7 @@ def sync(**kwargs):
     logs = get_logs(date, jira_only=True, tempo_format=True)
     if issue:
         logs = [l for l in logs if l['issue'] == issue] 
-
-    for log in logs:
-        worklogs = jira.get_worklogs(log['issue'])
-        print(Fore.YELLOW + Style.NORMAL + f"{log['issue']}, {log['timeSpent']}, {log['comment']}")
-        if any([log['comment'] == wl['comment'] for wl in worklogs]):
-            # Log already exists in Jira worklogs
-            print('Log already exists')
-        else:
-            # Log does not exist in Jira, upload
-            print('syncing log')
-            jira.add_worklog(**log)
-        print()
+    sync_logs(logs, date)
 
 
 @greet.command()
