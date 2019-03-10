@@ -1,17 +1,20 @@
 import json
-from datetime import datetime
-from dateutil.parser import parse
+from datetime import datetime, date
 
 import click
 import simplejson
 import colorama
 from colorama import Fore, Style
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+from dateutil.rrule import rrule, DAILY
 
 from src import watson
 from src import jira
 
 colorama.init(autoreset=True)
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+TODAY = date.today()
 
 
 def get_logs(date, jira_only=False, tempo_format=False):
@@ -25,7 +28,14 @@ def to_ymd(datestring):
     return datestring.split('T')[0]
 
 
-def sync_logs(logs, date):
+def dates(days_ago):
+    dates = rrule(DAILY, dtstart=TODAY-relativedelta(days=days_ago), until=TODAY)
+    return [d.strftime('%Y-%m-%d') for d in dates]
+
+
+def sync_logs(logs):
+    if not logs:
+        print('No logs')
     for log in logs:
         worklogs = jira.get_worklogs(log['issue'])
         print(Fore.YELLOW + Style.NORMAL + f"{log['issue']}, {log['timeSpent']}, {log['comment']}")
@@ -45,15 +55,25 @@ def greet():
 
 
 @greet.command()
-@click.option('--date', default='None', help='date to sync logs')
+@click.option('--date', default=None, help='date to sync logs')
+@click.option('--from', default=0, type=int, help='sync logs from this long ago')
 @click.option('--issue', default=None, help='only sync logs for this issue')
 def sync(**kwargs):
+    from_days = kwargs['from']
     date = kwargs['date']
     issue = kwargs['issue']
-    logs = get_logs(date, jira_only=True, tempo_format=True)
-    if issue:
-        logs = [l for l in logs if l['issue'] == issue] 
-    sync_logs(logs, date)
+
+    datelist = dates(from_days)
+    if date:  # specific date trumps a range
+        datelist = [date]
+
+    for date in datelist:
+        print(Fore.GREEN + Style.NORMAL + f'{date}')
+        logs = get_logs(date, jira_only=True, tempo_format=True)
+        if issue:
+            logs = [l for l in logs if l['issue'] == issue] 
+        sync_logs(logs)
+        print('-'*20)
 
 
 @greet.command()
