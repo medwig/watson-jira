@@ -4,10 +4,13 @@ from dateutil.parser import parse
 
 import click
 import simplejson
+import colorama
+from colorama import Fore, Style
 
 from src import watson
 from src import jira
 
+colorama.init(autoreset=True)
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
@@ -40,7 +43,7 @@ def sync(**kwargs):
 
     for log in logs:
         worklogs = jira.get_worklogs(log['issue'])
-        print(log['issue'], log['timeSpent'], log['comment'])
+        print(Fore.YELLOW + Style.NORMAL + f"{log['issue']}, {log['timeSpent']}, {log['comment']}")
         if any([log['comment'] == wl['comment'] for wl in worklogs]):
             # Log already exists in Jira worklogs
             print('Log already exists')
@@ -48,7 +51,7 @@ def sync(**kwargs):
             # Log does not exist in Jira, upload
             print('syncing log')
             jira.add_worklog(**log)
-        print('-'*20)
+        print()
 
 
 @greet.command()
