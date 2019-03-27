@@ -39,7 +39,7 @@ def report_day(date, jira_only=False):
     process = Popen(['watson', 'report', '--from', date, '--to', date,
                      '--json'], stdout=PIPE, stderr=PIPE)
     # cmd = process.args
-    stdout, stderr = process.communicate()
+    stdout, _stderr = process.communicate()
     report = json.loads(stdout.decode('ascii').strip())
     if jira_only:
         report = filter_jiras(report) 
