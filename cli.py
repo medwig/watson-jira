@@ -1,16 +1,15 @@
 import json
-from datetime import datetime, date
+from datetime import date, datetime
 
 import click
-import simplejson
 import colorama
+import simplejson
 from colorama import Fore, Style
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from dateutil.rrule import rrule, DAILY
+from dateutil.rrule import DAILY, rrule
 
-from src import watson
-from src import jira
+from src import jira, watson
 
 colorama.init(autoreset=True)
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
