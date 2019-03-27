@@ -1,11 +1,10 @@
 import json
-from datetime import date, datetime
+from datetime import date
 
 import click
 import colorama
 import simplejson
 from colorama import Fore, Style
-from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import DAILY, rrule
 
