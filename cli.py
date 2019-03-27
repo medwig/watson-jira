@@ -13,6 +13,7 @@ from src import jira, watson
 colorama.init(autoreset=True)
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 TODAY = date.today()
+TODAY_YMD = TODAY.strftime("%Y-%m-%d")
 
 
 def get_logs(date, jira_only=False, tempo_format=False):
@@ -57,7 +58,7 @@ def greet():
 
 
 @greet.command()
-@click.option("--date", default=None, help="date to sync logs")
+@click.option("--date", default=TODAY_YMD, help="date to sync logs")
 @click.option("--from", default=0, type=int, help="sync logs from this long ago")
 @click.option("--issue", default=None, help="only sync logs for this issue")
 def sync(**kwargs):
@@ -93,7 +94,7 @@ def tempo(**kwargs):
 
 
 @greet.command()
-@click.option("--date", default="None", help="date to get logs")
+@click.option("--date", default=TODAY_YMD, help="date to get logs")
 @click.option("--jira-only", is_flag=True, help="only return logs for Jira issues")
 @click.option("--tempo-format", is_flag=True, help="format logs for tempo timesheet")
 def logs(**kwargs):
