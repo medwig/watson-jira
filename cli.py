@@ -58,7 +58,7 @@ def greet():
 
 
 @greet.command()
-@click.option("--date", default=TODAY_YMD, help="date to sync logs")
+@click.option("--date", default=None, help="date to sync logs")
 @click.option("--from", default=0, type=int, help="sync logs from this long ago")
 @click.option("--issue", default=None, help="only sync logs for this issue")
 def sync(**kwargs):
