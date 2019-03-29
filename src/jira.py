@@ -60,6 +60,6 @@ if __name__ == "__main__":
     comment = "comment_test_test"
     started = datetime(2006, 11, 21, 16, 30)
     wls = get_worklogs(issue)
-    print(json.dumps(wls))
+    #print(json.dumps(wls))
     #  r = add_worklog(issue, time_spent, comment, started)
     #  print(r)
