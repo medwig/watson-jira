@@ -48,4 +48,4 @@ def report_day(date, jira_only=False):
     report = json.loads(stdout.decode("ascii").strip())
     if jira_only:
         report = filter_jiras(report)
-    return report
+    return report["projects"]
