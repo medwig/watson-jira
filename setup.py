@@ -11,6 +11,7 @@ setup(
     version="0.1.0",
     description="Format and upload Watson time logs to Jira as Tempo worklogs",
     long_description=readme(),
+    long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
