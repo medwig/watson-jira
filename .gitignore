@@ -118,3 +118,6 @@ dmypy.json
 
 # Vim swap files
 *.swp
+
+# IDEs
+.vscode/
