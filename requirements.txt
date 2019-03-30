@@ -1,4 +1,0 @@
-python-dateutil
-click
-simplejson
-colorama

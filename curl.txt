@@ -1,3 +1,0 @@
-curl --request GET \   
--u jon@skywatch.co:WJmIkdCTHsQhq61BOjEl5102 \
---url https://skywatch.atlassian.net/rest/api/2/issue/OO-760/worklog 
