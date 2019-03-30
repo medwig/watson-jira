@@ -8,8 +8,8 @@ def readme():
 
 setup(
     name="watson_jira",
-    version="0.1",
-    description="Format and upload Watson time logs to Jira Tempo time tracking",
+    version="0.1.0",
+    description="Format and upload Watson time logs to Jira as Tempo worklogs",
     long_description=readme(),
     classifiers=[
         "Development Status :: 3 - Alpha",
