@@ -10,3 +10,5 @@ Upload watson time logs to Jira.
 
 ##### Help:
 `$ watson-jira --help`
+
+Will install TD-Watson https://github.com/TailorDev/Watson as one of it's dependencies, not surprisingly.
