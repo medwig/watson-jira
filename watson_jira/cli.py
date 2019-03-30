@@ -18,18 +18,11 @@ TODAY = date.today()
 TODAY_YMD = TODAY.strftime("%Y-%m-%d")
 
 
-def get_logs(date, jira_only=False, tempo_format=False):
-    logs = watson.report_day(date, jira_only)
-    if tempo_format:
-        logs = watson.report_to_worklogs(logs)
-    return logs
-
-
 def to_ymd(datestring):
     return datestring.split("T")[0]
 
 
-def dates(days_ago):
+def dates_from(days_ago):
     dates = rrule(DAILY, dtstart=TODAY - relativedelta(days=days_ago), until=TODAY)
     return [d.strftime("%Y-%m-%d") for d in dates]
 
@@ -64,17 +57,17 @@ def main():
 @click.option("--from", default=0, type=int, help="sync logs from this long ago")
 @click.option("--issue", default=None, help="only sync logs for this issue")
 def sync(**kwargs):
-    from_days = kwargs["from"]
+    days_ago = kwargs["from"]
     date = kwargs["date"]
     issue = kwargs["issue"]
 
-    datelist = dates(from_days)
+    datelist = dates_from(days_ago)
     if date:  # specific date trumps a range
         datelist = [date]
 
     for date in datelist:
         print(Fore.GREEN + Style.NORMAL + f"{date}")
-        logs = get_logs(date, jira_only=True, tempo_format=True)
+        logs = watson.report_day(date, jira_only=True, tempo_format=True)
         if issue:
             logs = [l for l in logs if l["issue"] == issue]
         sync_logs(logs)
@@ -91,8 +84,7 @@ def tempo(**kwargs):
         worklogs = jira.get_worklog(issue, _id)
     else:
         worklogs = jira.get_worklogs(issue)
-
-    print(simplejson.dumps(worklogs, skipkeys=True))
+    click.echo(simplejson.dumps(worklogs, skipkeys=True))
 
 
 @main.command()
@@ -100,12 +92,10 @@ def tempo(**kwargs):
 @click.option("--jira-only", is_flag=True, help="only return logs for Jira issues")
 @click.option("--tempo-format", is_flag=True, help="format logs for tempo timesheet")
 def logs(**kwargs):
-    date = kwargs["date"]
-    jira_only = kwargs["jira_only"]
-    tempo_format = kwargs["tempo_format"]
-
-    logs = get_logs(date, jira_only, tempo_format)
-    print(json.dumps(logs))
+    logs = watson.report_day(
+        kwargs["date"], kwargs["jira_only"], kwargs["tempo_format"]
+    )
+    click.echo(json.dumps(logs))
 
 
 if __name__ == "__main__":

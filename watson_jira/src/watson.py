@@ -33,19 +33,21 @@ def report_to_worklogs(report):
                 ),  # Watson logs in seconds, Jira in minutes
             }
             worklogs.append(worklog)
-    return worklogs
+    report["projects"] = worklogs
+    return report
 
 
-def report_day(date, jira_only=False):
+def report_day(date, jira_only=False, tempo_format=False):
     """Get Watson report for a given date in JSON"""
     process = Popen(
         ["watson", "report", "--from", date, "--to", date, "--json"],
         stdout=PIPE,
         stderr=PIPE,
     )
-    # cmd = process.args
     stdout, _stderr = process.communicate()
     report = json.loads(stdout.decode("ascii").strip())
     if jira_only:
         report = filter_jiras(report)
+    if tempo_format:
+        report = report_to_worklogs(report)
     return report["projects"]
