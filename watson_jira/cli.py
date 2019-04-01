@@ -1,8 +1,9 @@
+import os
 import json
 from datetime import date
 
-import click
 import colorama
+import click
 import simplejson
 from colorama import Fore, Style
 from dateutil.relativedelta import relativedelta
@@ -96,6 +97,21 @@ def logs(**kwargs):
         kwargs["date"], kwargs["jira_only"], kwargs["tempo_format"]
     )
     click.echo(json.dumps(logs))
+
+
+@main.command()
+def init(**kwargs):
+    print(
+        "create token here and copy to clipboard:\n>> https://id.atlassian.com/manage/api-tokens#\n"
+    )
+    token = click.prompt("Jira token: ", type=str)
+    email = click.prompt("Jira email: ", type=str)
+    url = click.prompt("Jira url (example fooco.atlassian.net): ", type=str)
+    with open(os.path.expanduser("~/.netrc"), "a+") as netrc:
+        netrc.writelines(
+            ["\n" f"machine {url}\n" f"login {email}\n" f"password {token}\n"]
+        )
+    click.echo(Fore.YELLOW + "\n~\\.netrc written\nReady to go!")
 
 
 if __name__ == "__main__":
