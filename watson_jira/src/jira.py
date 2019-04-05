@@ -34,5 +34,14 @@ def add_worklog(issue, timeSpent, comment, started):
     return wl
 
 
+def test_conn():
+    user = jira.current_user()
+    try:
+        assert user != "anonymous"
+    except AssertionError:
+        return False
+    return user
+
+
 if __name__ == "__main__":
     pass

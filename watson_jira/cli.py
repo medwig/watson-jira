@@ -101,6 +101,10 @@ def logs(**kwargs):
 
 @main.command()
 def init(**kwargs):
+    current_user = jira.test_conn()
+    if current_user:
+        click.echo(f'Configured as user="{current_user}" and ready to go!')
+        return
     print(
         "create token here and copy to clipboard:\n>> https://id.atlassian.com/manage/api-tokens#\n"
     )
