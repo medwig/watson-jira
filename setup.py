@@ -31,7 +31,7 @@ setup(
         "colorama",
         "jira",
     ],
-    setup_requires=["pytest-runner", "setuptools>40.0.0"],
+    setup_requires=["pytest-runner"],
     tests_require=["pytest"],
     entry_points={"console_scripts": ["watson-jira=watson_jira.cli:main"]},
     zip_safe=False,
