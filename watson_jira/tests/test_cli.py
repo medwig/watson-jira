@@ -29,7 +29,6 @@ def test_logs_tempoformat(runner):
     assert isinstance(json.loads(result.output), list)
 
 
-def test_tempo_issue(runner):
-    result = runner.invoke(cli.main, ["tempo", "--issue", "AP-217"])
+def test_tempo_help(runner):
+    result = runner.invoke(cli.main, ["tempo", "-h"])
     assert result.exit_code == 0
-    assert isinstance(json.loads(result.output), list)
