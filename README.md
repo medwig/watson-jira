@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/medwig/watson-jira.svg?style=shield)](https://circleci.com/gh/medwig/watson-jira)
+
 # Watson-Jira
 
 Upload watson time logs to Jira from the CLI! Selects Watson time logs whose project name matches
