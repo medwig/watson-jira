@@ -8,6 +8,7 @@ import simplejson
 from colorama import Fore, Style
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import DAILY, rrule
+from dateutil.parser import parse
 
 from watson_jira.src import watson
 from watson_jira.src import jira
@@ -38,7 +39,13 @@ def sync_logs(logs):
             + Style.NORMAL
             + f"{log['issue']}, {log['timeSpent']}, {log['comment']}"
         )
-        if any([log["comment"] == wl["comment"] for wl in worklogs]):
+        if any(
+            [
+                log["comment"] == wl["comment"]
+                and parse(log["started"]).date() == parse(wl["started"]).date()
+                for wl in worklogs
+            ]
+        ):
             print("Log already exists")
         else:
             jira.add_worklog(**log)
