@@ -19,8 +19,8 @@ setup(
         "Topic :: Office/Business :: Scheduling",
     ],
     url="http://github.com/medwig/watson-jira",
-    author="Jonathan Medwig",
-    author_email="jonmedwig@gmail.com",
+    author="Matus Benko",
+    author_email="matus.benko@gmail.com",
     license="MIT",
     packages=["watson_jira", "watson_jira.src"],
     install_requires=[
@@ -30,6 +30,7 @@ setup(
         "simplejson",
         "colorama",
         "jira",
+        "pyyaml"
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],

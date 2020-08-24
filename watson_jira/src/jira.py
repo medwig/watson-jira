@@ -1,11 +1,10 @@
 from dateutil.parser import parse
-
 from jira import JIRA
+from watson_jira.src import config
 
-
-# credentials are stored in ~/.netrc
-jira = JIRA("https://skywatch.atlassian.net")
-
+options = {"verify": False}
+jiraconf = config.get()["jira"]
+jira = JIRA(server=jiraconf["server"], basic_auth=(jiraconf["username"], jiraconf["password"]), options=options)
 
 def get_worklog(issue, _id):
     worklog = jira.worklog(issue, _id)
@@ -18,7 +17,7 @@ def get_worklogs(issue):
     for worklog in worklogs:
         wl = {
             "issue": issue,
-            "comment": worklog.comment,
+            "comment": worklog.comment if hasattr(worklog, 'comment') else None,
             "started": worklog.started,
             "timeSpent": worklog.timeSpent,
             "id": worklog.id,
@@ -28,6 +27,7 @@ def get_worklogs(issue):
 
 
 def add_worklog(issue, timeSpent, comment, started):
+    print(f"issue = {issue}, timeSpent={timeSpent}, comment={comment}, started={started}")
     wl = jira.add_worklog(
         issue, timeSpent=timeSpent, comment=comment, started=parse(started)
     )

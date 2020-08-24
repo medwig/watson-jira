@@ -75,9 +75,10 @@ def sync(**kwargs):
 
     for date in datelist:
         print(Fore.GREEN + Style.NORMAL + f"{date}")
-        logs = watson.report_day(date, jira_only=True, tempo_format=True)
+        logs = watson.log_day(date, tempo_format=True)
         if issue:
             logs = [l for l in logs if l["issue"] == issue]
+
         sync_logs(logs)
         print("-" * 20)
 
@@ -97,11 +98,10 @@ def tempo(**kwargs):
 
 @main.command()
 @click.option("--date", default=TODAY_YMD, help="date to get logs")
-@click.option("--jira-only", is_flag=True, help="only return logs for Jira issues")
 @click.option("--tempo-format", is_flag=True, help="format logs for tempo timesheet")
 def logs(**kwargs):
-    logs = watson.report_day(
-        kwargs["date"], kwargs["jira_only"], kwargs["tempo_format"]
+    logs = watson.log_day(
+        kwargs["date"], kwargs["tempo_format"]
     )
     click.echo(json.dumps(logs))
 
@@ -118,7 +118,7 @@ def init(**kwargs):
     token = click.prompt("Jira token: ", type=str)
     email = click.prompt("Jira email: ", type=str)
     url = click.prompt("Jira url (example fooco.atlassian.net): ", type=str)
-    with open(os.path.expanduser("~/.netrc"), "a+") as netrc:
+    with open(os.path.expanduser("~/.config/watson-jira/.netrc"), "a+") as netrc:
         netrc.writelines(
             ["\n" f"machine {url}\n" f"login {email}\n" f"password {token}\n"]
         )
