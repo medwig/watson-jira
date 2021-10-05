@@ -1,0 +1,4 @@
+jira:
+  server: XXX
+  personalAccessToken: XXX
+  cookie: XXX

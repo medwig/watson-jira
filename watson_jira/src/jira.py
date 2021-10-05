@@ -2,9 +2,13 @@ from dateutil.parser import parse
 from jira import JIRA
 from watson_jira.src import config
 
-options = {"verify": False}
 jiraconf = config.get()["jira"]
-jira = JIRA(server=jiraconf["server"], basic_auth=(jiraconf["username"], jiraconf["password"]), options=options)
+# pat = jiraconf["personalAccessToken"]
+cookie = jiraconf["cookie"]
+headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
+# headers["Authorization"] = f"Bearer {pat}"
+headers["cookie"] = f"{cookie}"
+jira = JIRA(server=jiraconf["server"], options={"headers": headers})
 
 def get_worklog(issue, _id):
     worklog = jira.worklog(issue, _id)
