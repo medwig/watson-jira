@@ -19,8 +19,8 @@ setup(
         "Topic :: Office/Business :: Scheduling",
     ],
     url="http://github.com/medwig/watson-jira",
-    author="Matus Benko",
-    author_email="matus.benko@gmail.com",
+    author="Jonathan Medwig, Matus Benko",
+    author_email="jonmedwig@gmail.com, matus.benko@gmail.com",
     license="MIT",
     packages=["watson_jira", "watson_jira.src"],
     install_requires=[
