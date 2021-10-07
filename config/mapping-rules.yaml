@@ -12,3 +12,6 @@ categories:
     projects:
       project1: JIRA-2
       project2: JIRA-3
+  - name: mbo
+    description: 'Standalone objective'
+    type: issue_specified_in_project_name

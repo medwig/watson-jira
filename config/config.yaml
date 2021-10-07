@@ -1,4 +1,7 @@
 jira:
   server: XXX
+  login: XXX
+  # TODO: check how the token works in JIRA
+  apiToken: XXX
   personalAccessToken: XXX
   cookie: XXX

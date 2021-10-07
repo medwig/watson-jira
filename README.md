@@ -2,8 +2,7 @@
 
 # Watson-Jira
 
-Upload watson time logs to Jira from the CLI! Selects Watson time logs whose project name matches
-a Jira naming regex, formats those logs to Tempo format, and uploads to the appropriate Jira tickets.
+Upload watson time logs to Jira from the CLI! Selects Watson time logs based on the configurable mapping rules, formats those logs to Tempo format, and uploads to the appropriate Jira tickets.
 Will not double-write logs, and makes no local edits.
 
 ## Install
@@ -13,25 +12,86 @@ Will not double-write logs, and makes no local edits.
 
 ## Setup
 
-API access to Jira needs to be enabled, this can be done one of 2 ways:
+### JIRA Connection
 
-##### Guided:
+Connection to JIRA can be configured in `~/.config/watson-jira/config.yaml`.
 
-`$ watson-jira init`
+```
+jira:
+  server: XXX
+  login: XXX
+  # TODO: check how the token works in JIRA
+  # apiToken: XXX
+  # personalAccessToken: XXX
+  # cookie: XXX
+```
 
-##### Manual:
+#### Auth with API token
 
 1. Generate a Jira token: https://id.atlassian.com/manage/api-tokens#
-2. Add this to `~/.netrc`:
+2. Add this to config file :
 ```
-	machine yoururl.atlassian.net
-	login yourjiraemail@company.com
-	password <<Jira Token>>
+  apitToken <<Jira Token>>
 ```
 Replacing `<<Jira Token>>` with the token you copied from step 1.
 
-The library will read `~/.netrc`, no further config needed!
+#### Auth with Personal Access Token
 
+TODO:
+
+#### Auth with Cookie
+
+TODO:
+
+
+### Mapping rules
+
+Mapping rules can be configured in `~/.config/watson-jira/mapping-rules.yaml`.
+The precedence equal the order of listing.
+
+#### Single issue
+
+```
+  - name: vacation
+    description: 'Vacation'
+    type: single_issue
+    issue: JIRA-1
+```
+
+Logs containing tag matching the name of the mapping rule will be always synced to one specified JIRA ticket.
+
+#### Issue per project
+
+```
+  - name: other
+    description: 'Generic activities not related to any task in the current sprint.'
+    type: issue_per_project
+    projects:
+      project1: JIRA-2
+      project2: JIRA-3
+```
+
+Logs containing tag matching the name of the mapping rule will be synced to JIRA ticket resolved by project name.
+
+#### Issue specified in the tag
+
+```
+  - name: sprint
+    description: 'Activities performed in scope of sprint related to planned issues.'
+    type: issue_specified_in_tag
+```
+
+Logs containing tag matching the name of the mapping rule will be synced to JIRA ticket which is specified also as a tag.
+
+#### Issue specified in the project name
+
+```
+  - name: mbo
+    description: 'Standalone objective'
+    type: issue_specified_in_project_name
+```
+
+Logs of the project with name containing a JIRA ticket will be synced to the respective JIRA ticket.
 
 ## Usage
 
