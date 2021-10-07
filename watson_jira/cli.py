@@ -100,9 +100,7 @@ def tempo(**kwargs):
 @click.option("--date", default=TODAY_YMD, help="date to get logs")
 @click.option("--tempo-format", is_flag=True, help="format logs for tempo timesheet")
 def logs(**kwargs):
-    logs = watson.log_day(
-        kwargs["date"], kwargs["tempo_format"]
-    )
+    logs = watson.log_day(kwargs["date"], kwargs["tempo_format"])
     click.echo(json.dumps(logs))
 
 
