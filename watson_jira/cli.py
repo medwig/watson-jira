@@ -12,6 +12,7 @@ from dateutil.parser import parse
 
 from watson_jira.src import watson
 from watson_jira.src import jira
+from watson_jira.src import config
 
 colorama.init(autoreset=True)
 
@@ -54,6 +55,18 @@ def sync_logs(logs):
     return True
 
 
+def jira_connect():
+    try:
+        jira.connect()
+        return True
+    except config.ConfigException as e:
+        click.echo(Fore.RED + f"Configuration error: {e}")
+    except jira.JiraException as e:
+        click.echo(Fore.RED + f"JIRA error: {e}")
+
+    return False
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version="1.0.0")
 def main():
@@ -65,35 +78,37 @@ def main():
 @click.option("--from", default=0, type=int, help="sync logs from this long ago")
 @click.option("--issue", default=None, help="only sync logs for this issue")
 def sync(**kwargs):
-    days_ago = kwargs["from"]
-    date = kwargs["date"]
-    issue = kwargs["issue"]
+    if jira_connect():
+        days_ago = kwargs["from"]
+        date = kwargs["date"]
+        issue = kwargs["issue"]
 
-    datelist = dates_from(days_ago)
-    if date:  # specific date trumps a range
-        datelist = [date]
+        datelist = dates_from(days_ago)
+        if date:  # specific date trumps a range
+            datelist = [date]
 
-    for date in datelist:
-        print(Fore.GREEN + Style.NORMAL + f"{date}")
-        logs = watson.log_day(date, tempo_format=True)
-        if issue:
-            logs = [l for l in logs if l["issue"] == issue]
+        for date in datelist:
+            print(Fore.GREEN + Style.NORMAL + f"{date}")
+            logs = watson.log_day(date, tempo_format=True)
+            if issue:
+                logs = [l for l in logs if l["issue"] == issue]
 
-        sync_logs(logs)
-        print("-" * 20)
+            sync_logs(logs)
+            print("-" * 20)
 
 
 @main.command()
 @click.option("--issue", default=None, help="get worklogs from this issue")
 @click.option("--id", default=None, help="get specific worklog by id")
 def tempo(**kwargs):
-    issue = kwargs["issue"]
-    _id = kwargs["id"]
-    if _id:
-        worklogs = jira.get_worklog(issue, _id)
-    else:
-        worklogs = jira.get_worklogs(issue)
-    click.echo(simplejson.dumps(worklogs, skipkeys=True))
+    if jira_connect():
+        issue = kwargs["issue"]
+        _id = kwargs["id"]
+        if _id:
+            worklogs = jira.get_worklog(issue, _id)
+        else:
+            worklogs = jira.get_worklogs(issue)
+        click.echo(simplejson.dumps(worklogs, skipkeys=True))
 
 
 @main.command()
@@ -104,6 +119,7 @@ def logs(**kwargs):
     click.echo(json.dumps(logs))
 
 
+# TODO: rewrite to init at least config
 @main.command()
 def init(**kwargs):
     current_user = jira.test_conn()

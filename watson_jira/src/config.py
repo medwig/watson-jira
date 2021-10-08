@@ -1,6 +1,10 @@
 import yaml
 import os
-from jira import JIRA
+
+
+class ConfigException(Exception):
+    pass
+
 
 config = None
 
@@ -16,40 +20,40 @@ def get():
     return config
 
 
-def prepare_jira_connection():
+def jira():
     config = get()
-    if "jira" not in config:
-        print("Config file must have Jira section set")
-        return None
+    if config is None or "jira" not in config:
+        raise ConfigException("Config file must have Jira section set")
+
     jiraconfig = config["jira"]
+    jira = {
+        "server": None,
+        "auth": None,
+        "cookie": None,
+    }
 
     # Server must be specified
     if "server" not in jiraconfig:
-        print("JIRA server must be set")
-        return None
+        raise ConfigException("JIRA server must be set")
+
+    jira["server"] = jiraconfig["server"]
 
     # Prefer auth with personal access token
     if "username" in jiraconfig or "personalAccessToken" in jiraconfig:
         if "username" not in jiraconfig or "personalAccessToken" not in jiraconfig:
-            print(
+            raise ConfigException(
                 "Auth with credentials requires both username and personalAccessToken to be set"
             )
-            return None
-        print(f"{jiraconfig['username']}")
-        print(f"{jiraconfig['personalAccessToken']}")
-        return JIRA(
-            server=jiraconfig["server"],
-            basic_auth=(jiraconfig["username"], jiraconfig["personalAccessToken"]),
-        )
+
+        jira["auth"] = (jiraconfig["username"], jiraconfig["personalAccessToken"])
+        return jira
 
     # As second try to resolve and use cookie
     if "cookie" not in jiraconfig:
-        print("Auth requires credentials or cookie to be set")
-        return None
+        raise ConfigException("Auth requires credentials or cookie to be set")
 
-    headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
-    headers["cookie"] = f"{jiraconfig['cookie']}"
-    return JIRA(server=jiraconfig["server"], options={"headers": headers})
+    jira["cookie"] = jiraconfig["cookie"]
+    return jira
 
 
 if __name__ == "__main__":

@@ -14,6 +14,7 @@ def filter_jiras(report):
     return report
 
 
+# TODO: make it work with the mapper
 def report_to_worklogs(report):
     """Convert watson report to Tempo (Jira) worklog dictionaries"""
     date = report["timespan"]["to"]

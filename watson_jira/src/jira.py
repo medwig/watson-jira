@@ -1,7 +1,25 @@
 from dateutil.parser import parse
 from watson_jira.src import config
+from jira import JIRA
 
-jira = config.prepare_jira_connection()
+jira = None
+
+class JiraException(Exception):
+    pass
+
+def connect():
+    global jira
+    if jira is None:
+        jiraconfig = config.jira()
+        try:
+            if jiraconfig["auth"]:
+                jira = JIRA(server=jiraconfig["server"], basic_auth=jiraconfig["auth"])
+            else:
+                headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
+                headers["cookie"] = jiraconfig["cookie"]
+                jira = JIRA(server=jiraconfig["server"], options={"headers": headers})
+        except Exception as e:
+            raise JiraException("Connection failed")
 
 
 def get_worklog(issue, _id):
