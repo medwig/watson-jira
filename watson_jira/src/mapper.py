@@ -39,7 +39,7 @@ def ask():
     return click.prompt("Specify jira issue (leave empty to skip)", default="")
 
 
-def map(project, tags):
+def map(project, tags, is_interactive):
     global mapping_rules
 
     if mapping_rules is None:
@@ -48,7 +48,6 @@ def map(project, tags):
     jira_issue = None
     for category in mapping_rules["categories"]:
         if category["name"] in tags:
-            click.echo(Fore.YELLOW + f"{category['description']}" + Fore.RESET)
             if category["type"] == "single_issue":
                 jira_issue = process_single_issue(category)
             elif category["type"] == "issue_per_project":
@@ -60,18 +59,20 @@ def map(project, tags):
 
     if jira_issue is None:
         click.echo(get_styled_log(project, tags) + " - unable to match mapping rule")
-        jira_issue = ask()
-    else:
+        if is_interactive:
+            jira_issue = ask()
+    elif is_interactive:
         if not click.confirm(
             get_styled_log(project, tags) + f" will be logged to {jira_issue}",
             default=True,
         ):
             jira_issue = ask()
+    else:
+        click.echo(f"{jira_issue} => {get_styled_log(project, tags)}")
 
     if not jira_issue:
         jira_issue = None
 
-    print("-" * 20)
     return jira_issue
 
 

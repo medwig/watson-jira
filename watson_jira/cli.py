@@ -49,7 +49,7 @@ def sync_logs(logs):
         ):
             print("Log already exists")
         else:
-            jira.add_worklog(**log)
+            # jira.add_worklog(**log)
             print("synced log")
         print()
     return True
@@ -77,11 +77,13 @@ def main():
 @click.option("--date", default=None, help="date to sync logs")
 @click.option("--from", default=0, type=int, help="sync logs from this long ago")
 @click.option("--issue", default=None, help="only sync logs for this issue")
+@click.option("--interactive", is_flag=True, help="enable propmts to confirm or change target issue")
 def sync(**kwargs):
     if jira_connect():
         days_ago = kwargs["from"]
         date = kwargs["date"]
         issue = kwargs["issue"]
+        is_interactive = kwargs["interactive"]
 
         datelist = dates_from(days_ago)
         if date:  # specific date trumps a range
@@ -89,7 +91,7 @@ def sync(**kwargs):
 
         for date in datelist:
             print(Fore.GREEN + Style.NORMAL + f"{date}")
-            logs = watson.log_day(date, tempo_format=True)
+            logs = watson.log_day(date, tempo_format=True, is_interactive=is_interactive)
             if issue:
                 logs = [l for l in logs if l["issue"] == issue]
 

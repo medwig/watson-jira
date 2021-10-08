@@ -14,31 +14,11 @@ def filter_jiras(report):
     return report
 
 
-# TODO: make it work with the mapper
-def report_to_worklogs(report):
-    """Convert watson report to Tempo (Jira) worklog dictionaries"""
-    date = report["timespan"]["to"]
-    worklogs = []
-    for project in report["projects"]:
-        for tag in project["tags"]:
-            worklog = {
-                "issue": project["name"],
-                "started": date,
-                "comment": tag["name"],
-                "timeSpent": int(
-                    tag["time"] // 60 or 1
-                ),  # Watson logs in seconds, Jira in minutes
-            }
-            worklogs.append(worklog)
-    report["projects"] = worklogs
-    return report
-
-
-def logs_to_worklogs(logs):
+def logs_to_worklogs(logs, is_interactive):
     """Convert Watson logs to Tempo (Jira) worklog dictionaries"""
     worklogs = []
     for log in logs:
-        jira_issue = mapper.map(log["project"], log["tags"])
+        jira_issue = mapper.map(log["project"], log["tags"], is_interactive)
         if jira_issue is None:
             continue
 
@@ -62,23 +42,7 @@ def get_time_spent(start, stop):
     return int((datetime_stop - datetime_start).total_seconds() // 60 or 1)
 
 
-def report_day(date, jira_only=False, tempo_format=False):
-    """Get Watson report for a given date in JSON"""
-    process = Popen(
-        ["watson", "report", "--from", date, "--to", date, "--json"],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, _stderr = process.communicate()
-    report = json.loads(stdout.decode("ascii").strip())
-    if jira_only:
-        report = filter_jiras(report)
-    if tempo_format:
-        report = report_to_worklogs(report)
-    return report["projects"]
-
-
-def log_day(date, tempo_format=False):
+def log_day(date, tempo_format=False, is_interactive=False):
     """Get Watson logs for given date in JSON"""
     process = Popen(
         ["watson", "log", "--from", date, "--to", date, "--json"],
@@ -88,5 +52,5 @@ def log_day(date, tempo_format=False):
     stdout, _stderr = process.communicate()
     logs = json.loads(stdout.decode("ascii").strip())
     if tempo_format:
-        logs = logs_to_worklogs(logs)
+        logs = logs_to_worklogs(logs, is_interactive)
     return logs
