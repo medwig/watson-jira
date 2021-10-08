@@ -4,8 +4,6 @@ import click
 import os
 from colorama import Fore, Style
 
-from watson_jira.src.util import get_styled_log
-
 mapping_rules = None
 
 
@@ -75,7 +73,11 @@ def map(project, tags, is_interactive):
 
 
 def get_styled_log(project, tags):
-    return Fore.MAGENTA + f"{project}" + Fore.BLUE + f" {tags}" + Fore.RESET
+    out = Fore.MAGENTA + f"{project}"
+    tag_delimeter = f"{Fore.RESET},{Fore.BLUE} "
+    if len(tags):
+        out += f"  {Fore.RESET}[{Fore.BLUE}{tag_delimeter.join(tags)}{Fore.RESET}]"
+    return out
 
 
 if __name__ == "__main__":

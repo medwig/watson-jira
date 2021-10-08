@@ -11,7 +11,6 @@ from dateutil.rrule import DAILY, rrule
 from dateutil.parser import parse
 
 from watson_jira.src import watson, jira, config
-from watson_jira.src.util import get_styled_log
 
 colorama.init(autoreset=True)
 
@@ -39,7 +38,7 @@ def sync_logs(logs):
         started_datetime = parse(log["started"])
         started_formatted = started_datetime.strftime("%H:%M")
         print(
-            f"{Fore.MAGENTA}{log['issue']}{Fore.RESET} at {Fore.BLUE}{started_formatted}{Fore.RESET} for {Fore.BLUE}{log['timeSpent']}min{Fore.RESET} ",
+            f"{Fore.BLUE}{log['issue']}{Fore.RESET} at {Fore.GREEN}{started_formatted}{Fore.RESET} {log['timeSpent']}m ",
             end="",
         )
 
@@ -51,7 +50,7 @@ def sync_logs(logs):
                 for wl in worklogs
             ]
         ):
-            print("already exists")
+            print(Fore.YELLOW + "already exists")
         else:
             # jira.add_worklog(**log)
             print(Fore.GREEN + "synced")
