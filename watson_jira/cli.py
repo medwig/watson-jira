@@ -98,7 +98,7 @@ def sync(**kwargs):
 
 
 @main.command()
-@click.option("--issue", default=None, help="get worklogs from this issue")
+@click.option("--issue", default=None, required=True, help="get worklogs from this issue")
 @click.option("--id", default=None, help="get specific worklog by id")
 def tempo(**kwargs):
     if jira_connect():
