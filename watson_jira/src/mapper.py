@@ -4,6 +4,8 @@ import click
 import os
 from colorama import Fore, Style
 
+from watson_jira.src.util import get_styled_log
+
 mapping_rules = None
 
 
@@ -32,7 +34,7 @@ def process_issue_specified_in_tag(tags):
 
 def load_mapping_rules():
     stream = open(os.path.expanduser("~/.config/watson-jira/mapping-rules.yaml"))
-    return yaml.load(stream)
+    return yaml.safe_load(stream)
 
 
 def ask():
@@ -45,6 +47,7 @@ def map(project, tags, is_interactive):
     if mapping_rules is None:
         mapping_rules = load_mapping_rules()
 
+    # resolve jira issue
     jira_issue = None
     for category in mapping_rules["categories"]:
         if category["name"] in tags:
@@ -54,25 +57,20 @@ def map(project, tags, is_interactive):
                 jira_issue = process_issue_per_project(category, project)
             elif category["type"] == "issue_specified_in_tag":
                 jira_issue = process_issue_specified_in_tag(tags)
-            else:
-                print("Invalid type of the significant tag")
 
+    # print the status
+    styled_log = get_styled_log(project, tags)
     if jira_issue is None:
-        click.echo(get_styled_log(project, tags) + " - unable to match mapping rule")
-        if is_interactive:
-            jira_issue = ask()
-    elif is_interactive:
-        if not click.confirm(
-            get_styled_log(project, tags) + f" will be logged to {jira_issue}",
-            default=True,
-        ):
-            jira_issue = ask()
+        click.echo(f"{styled_log} {Fore.RED}unresolved{Fore.RESET}")
     else:
-        click.echo(f"{jira_issue} => {get_styled_log(project, tags)}")
+        click.echo(f"{styled_log} {Fore.GREEN}{jira_issue}{Fore.RESET}")
+
+    # interact with user
+    if is_interactive and jira_issue is None:
+        jira_issue = ask()
 
     if not jira_issue:
         jira_issue = None
-
     return jira_issue
 
 

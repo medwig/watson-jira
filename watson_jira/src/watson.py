@@ -1,6 +1,7 @@
 import json
 from subprocess import Popen, PIPE
 from datetime import datetime
+from colorama import Fore
 
 from watson_jira.src import mapper
 
@@ -16,6 +17,7 @@ def filter_jiras(report):
 
 def logs_to_worklogs(logs, is_interactive):
     """Convert Watson logs to Tempo (Jira) worklog dictionaries"""
+    print(Fore.YELLOW + "Mapping watson logs to JIRA tickets")
     worklogs = []
     for log in logs:
         jira_issue = mapper.map(log["project"], log["tags"], is_interactive)

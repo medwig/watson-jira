@@ -10,9 +10,8 @@ from dateutil.relativedelta import relativedelta
 from dateutil.rrule import DAILY, rrule
 from dateutil.parser import parse
 
-from watson_jira.src import watson
-from watson_jira.src import jira
-from watson_jira.src import config
+from watson_jira.src import watson, jira, config
+from watson_jira.src.util import get_styled_log
 
 colorama.init(autoreset=True)
 
@@ -33,25 +32,30 @@ def dates_from(days_ago):
 def sync_logs(logs):
     if not logs:
         print("No logs")
+    else:
+        print(Fore.YELLOW + "\nSyncing to JIRA")
+
     for log in logs:
-        worklogs = jira.get_worklogs(log["issue"])
+        started_datetime = parse(log["started"])
+        started_formatted = started_datetime.strftime("%H:%M")
         print(
-            Fore.YELLOW
-            + Style.NORMAL
-            + f"{log['issue']}, {log['timeSpent']}, {log['comment']}"
+            f"{Fore.MAGENTA}{log['issue']}{Fore.RESET} at {Fore.BLUE}{started_formatted}{Fore.RESET} for {Fore.BLUE}{log['timeSpent']}min{Fore.RESET} ",
+            end="",
         )
+
+        worklogs = jira.get_worklogs(log["issue"])
         if any(
             [
                 log["comment"] == wl["comment"]
-                and parse(log["started"]).date() == parse(wl["started"]).date()
+                and started_datetime.date() == parse(wl["started"]).date()
                 for wl in worklogs
             ]
         ):
-            print("Log already exists")
+            print("already exists")
         else:
             # jira.add_worklog(**log)
-            print("synced log")
-        print()
+            print(Fore.GREEN + "synced")
+
     return True
 
 
@@ -77,7 +81,11 @@ def main():
 @click.option("--date", default=None, help="date to sync logs")
 @click.option("--from", default=0, type=int, help="sync logs from this long ago")
 @click.option("--issue", default=None, help="only sync logs for this issue")
-@click.option("--interactive", is_flag=True, help="enable propmts to confirm or change target issue")
+@click.option(
+    "--interactive",
+    is_flag=True,
+    help="enable propmts to confirm or change target issue",
+)
 def sync(**kwargs):
     if jira_connect():
         days_ago = kwargs["from"]
@@ -90,17 +98,23 @@ def sync(**kwargs):
             datelist = [date]
 
         for date in datelist:
-            print(Fore.GREEN + Style.NORMAL + f"{date}")
-            logs = watson.log_day(date, tempo_format=True, is_interactive=is_interactive)
+            print()
+            print(Fore.CYAN + Style.NORMAL + f"{date}")
+            logs = watson.log_day(
+                date, tempo_format=True, is_interactive=is_interactive
+            )
             if issue:
                 logs = [l for l in logs if l["issue"] == issue]
 
             sync_logs(logs)
-            print("-" * 20)
+
+        print(Fore.CYAN + "\nSynchronization finished\n" + Fore.RESET)
 
 
 @main.command()
-@click.option("--issue", default=None, required=True, help="get worklogs from this issue")
+@click.option(
+    "--issue", default=None, required=True, help="get worklogs from this issue"
+)
 @click.option("--id", default=None, help="get specific worklog by id")
 def tempo(**kwargs):
     if jira_connect():

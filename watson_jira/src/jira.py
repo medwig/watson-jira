@@ -4,8 +4,10 @@ from jira import JIRA
 
 jira = None
 
+
 class JiraException(Exception):
     pass
+
 
 def connect():
     global jira
