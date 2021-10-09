@@ -45,7 +45,7 @@ def map(project, tags, is_interactive):
     if mapping_rules is None:
         mapping_rules = load_mapping_rules()
 
-    # resolve jira issue
+    # resolve jira issue from the tag
     jira_issue = None
     for category in mapping_rules["categories"]:
         if category["name"] in tags:
@@ -55,6 +55,10 @@ def map(project, tags, is_interactive):
                 jira_issue = process_issue_per_project(category, project)
             elif category["type"] == "issue_specified_in_tag":
                 jira_issue = process_issue_specified_in_tag(tags)
+
+    # backward compatibility - resolve jira issue from project name
+    if jira_issue is None and is_jira_issue(project):
+        jira_issue = project
 
     # print the status
     styled_log = get_styled_log(project, tags)

@@ -20,8 +20,6 @@ Connection to JIRA can be configured in `~/.config/watson-jira/config.yaml`.
 jira:
   server: XXX
   login: XXX
-  # TODO: check how the token works in JIRA
-  # apiToken: XXX
   # personalAccessToken: XXX
   # cookie: XXX
 ```
@@ -84,12 +82,6 @@ Logs containing tag matching the name of the mapping rule will be synced to JIRA
 Logs containing tag matching the name of the mapping rule will be synced to JIRA ticket which is specified also as a tag.
 
 #### Issue specified in the project name
-
-```
-  - name: mbo
-    description: 'Standalone objective'
-    type: issue_specified_in_project_name
-```
 
 Logs of the project with name containing a JIRA ticket will be synced to the respective JIRA ticket.
 
