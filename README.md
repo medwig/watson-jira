@@ -18,28 +18,34 @@ Connection to JIRA can be configured in `~/.config/watson-jira/config.yaml`.
 
 ```
 jira:
-  server: XXX
-  login: XXX
-  # personalAccessToken: XXX
-  # cookie: XXX
+  server: <<JIRA Base URL>>
 ```
 
 #### Auth with API token
 
-1. Generate a Jira token: https://id.atlassian.com/manage/api-tokens#
-2. Add this to config file :
+See [atlassian docs](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/) and following to the config file:
+
 ```
-  apitToken <<Jira Token>>
+  email: <<email>>
+  apiToken: <<Jira API Token>>
 ```
-Replacing `<<Jira Token>>` with the token you copied from step 1.
 
 #### Auth with Personal Access Token
 
-TODO:
+See [atlassian docs](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html) and following to the config file:
+
+```
+  personalAccessToken: <<PAT>>
+```
+
 
 #### Auth with Cookie
 
-TODO:
+Login to JIRA in the browser, open Network tab in the developer tools, copy the cookie from the request header and following to the config file:
+
+```
+  cookie: <<Cookie value (without 'Cookie:')>>
+```
 
 
 ### Mapping rules
