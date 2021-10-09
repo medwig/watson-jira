@@ -12,9 +12,16 @@ config = None
 def get():
     global config
     if config is None:
-        path = os.path.expanduser("~/.config/watson-jira/config.yaml")
-        stream = open(path)
-        config = yaml.safe_load(stream)
+        try:
+            path = os.path.expanduser("~/.config/watson-jira/config.yaml")
+            stream = open(path)
+        except Exception:
+            raise ConfigException("Failed to open config file")
+
+        try:
+            config = yaml.safe_load(stream)
+        except Exception:
+            raise ConfigException("Failed to parse config file")
 
     return config
 
@@ -27,7 +34,9 @@ def jira():
     jiraconfig = config["jira"]
     jira = {
         "server": None,
-        "auth": None,
+        "email": None,
+        "apiToken": None,
+        "pat": None,
         "cookie": None,
     }
 
@@ -37,22 +46,28 @@ def jira():
 
     jira["server"] = jiraconfig["server"]
 
-    # Prefer auth with personal access token
-    if "username" in jiraconfig or "personalAccessToken" in jiraconfig:
-        if "username" not in jiraconfig or "personalAccessToken" not in jiraconfig:
-            raise ConfigException(
-                "Auth with credentials requires both username and personalAccessToken to be set"
-            )
-
-        jira["auth"] = (jiraconfig["username"], jiraconfig["personalAccessToken"])
+    # Try to resolve personal access token
+    if "personalAccessToken" in jiraconfig:
+        jira["pat"] = jiraconfig["personalAccessToken"]
         return jira
 
-    # As second try to resolve and use cookie
-    if "cookie" not in jiraconfig:
-        raise ConfigException("Auth requires credentials or cookie to be set")
+    # Try to resolve email and API token
+    if "email" in jiraconfig or "apiToken" in jiraconfig:
+        if "email" not in jiraconfig or "apiToken" not in jiraconfig:
+            raise ConfigException(
+                "Auth method with email and API token requires both to be set"
+            )
 
-    jira["cookie"] = jiraconfig["cookie"]
-    return jira
+        jira["email"] = jiraconfig["email"]
+        jira["apiToken"] = jiraconfig["apiToken"]
+        return jira
+
+    # Try to resolve cookie
+    if "cookie" in jiraconfig:
+        jira["cookie"] = jiraconfig["cookie"]
+        return jira
+
+    raise ConfigException("No authentication method configured")
 
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ See [atlassian docs](https://confluence.atlassian.com/enterprise/using-personal-
 Login to JIRA in the browser, open Network tab in the developer tools, copy the cookie from the request header and following to the config file:
 
 ```
-  cookie: <<Cookie value (without 'Cookie:')>>
+  cookie: <<Cookie value (without the param name 'Cookie:')>>
 ```
 
 

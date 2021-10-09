@@ -13,14 +13,27 @@ def connect():
     global jira
     if jira is None:
         jiraconfig = config.jira()
+        print()
+        print(f"Connecting to {jiraconfig['server']}")
         try:
-            if jiraconfig["auth"]:
-                jira = JIRA(server=jiraconfig["server"], basic_auth=jiraconfig["auth"])
+            if jiraconfig["pat"]:
+                print("Using personal access token auth method")
+                headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
+                headers["Authorization"] = jiraconfig["pat"]
+                jira = JIRA(server=jiraconfig["server"], options={"headers": headers})
+
+            elif jiraconfig["apiToken"]:
+                print("Using email with API token auth method")
+                auth = (jiraconfig["email"], jiraconfig["apiToken"])
+                jira = JIRA(server=jiraconfig["server"], basic_auth=auth)
+
             else:
+                print("Using cookie auth method")
                 headers = JIRA.DEFAULT_OPTIONS["headers"].copy()
                 headers["cookie"] = jiraconfig["cookie"]
                 jira = JIRA(server=jiraconfig["server"], options={"headers": headers})
-        except Exception as e:
+
+        except Eception as e:
             raise JiraException("Connection failed")
 
 
