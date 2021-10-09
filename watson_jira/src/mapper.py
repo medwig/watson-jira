@@ -4,7 +4,7 @@ import click
 import os
 from colorama import Fore, Style
 
-mapping_rules = None
+from watson_jira.src import config
 
 
 def is_jira_issue(string):
@@ -13,13 +13,13 @@ def is_jira_issue(string):
     return bool(re.match(jira_regex, string))
 
 
-def process_single_issue(category):
-    return category["issue"]
+def process_single_issue(mapping):
+    return mapping["issue"]
 
 
-def process_issue_per_project(category, project):
-    if project in category["projects"].keys():
-        return category["projects"][project]
+def process_issue_per_project(mapping, project):
+    if project in mapping["projects"].keys():
+        return mapping["projects"][project]
     return None
 
 
@@ -30,30 +30,22 @@ def process_issue_specified_in_tag(tags):
     return None
 
 
-def load_mapping_rules():
-    stream = open(os.path.expanduser("~/.config/watson-jira/mapping-rules.yaml"))
-    return yaml.safe_load(stream)
-
-
 def ask():
     return click.prompt("Specify jira issue (leave empty to skip)", default="")
 
 
 def map(project, tags, is_interactive):
-    global mapping_rules
-
-    if mapping_rules is None:
-        mapping_rules = load_mapping_rules()
+    mappings = config.mappings()
 
     # resolve jira issue from the tag
     jira_issue = None
-    for category in mapping_rules["categories"]:
-        if category["name"] in tags:
-            if category["type"] == "single_issue":
-                jira_issue = process_single_issue(category)
-            elif category["type"] == "issue_per_project":
-                jira_issue = process_issue_per_project(category, project)
-            elif category["type"] == "issue_specified_in_tag":
+    for mapping in mappings:
+        if mapping["name"] in tags:
+            if mapping["type"] == "single_issue":
+                jira_issue = process_single_issue(mapping)
+            elif mapping["type"] == "issue_per_project":
+                jira_issue = process_issue_per_project(mapping, project)
+            elif mapping["type"] == "issue_specified_in_tag":
                 jira_issue = process_issue_specified_in_tag(tags)
 
     # backward compatibility - resolve jira issue from project name

@@ -26,10 +26,17 @@ def get():
     return config
 
 
+def mappings():
+    config = get()
+    if config is None or "mappings" not in config:
+        raise ConfigException("Config file must have `mappings` section")
+    return config["mappings"]
+
+
 def jira():
     config = get()
     if config is None or "jira" not in config:
-        raise ConfigException("Config file must have Jira section set")
+        raise ConfigException("Config file must have `jira` section")
 
     jiraconfig = config["jira"]
     jira = {

@@ -6,15 +6,6 @@ from colorama import Fore
 from watson_jira.src import mapper
 
 
-def filter_jiras(report):
-    jira_projects = []
-    for project in report["projects"]:
-        if mapper.is_jira_issue(project["name"]):
-            jira_projects.append(project)
-    report["projects"] = jira_projects
-    return report
-
-
 def logs_to_worklogs(logs, is_interactive):
     """Convert Watson logs to Tempo (Jira) worklog dictionaries"""
     print(Fore.YELLOW + "Mapping watson logs to JIRA tickets")
