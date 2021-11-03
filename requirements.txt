@@ -6,3 +6,4 @@ colorama
 jira
 pyyaml
 pyxdg
+pytest

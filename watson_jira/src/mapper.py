@@ -1,8 +1,6 @@
 import re
-import yaml
 import click
-import os
-from colorama import Fore, Style
+from colorama import Fore
 
 from watson_jira.src import config
 

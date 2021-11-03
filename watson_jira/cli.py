@@ -59,19 +59,21 @@ def sync_logs(logs):
 
 def jira_connect():
     try:
-        (server, auth_method) = jira.connect()
-        print(f"Connecting to {server}")
-        if auth_method == "pat":
-            print("Using personal access token auth method")
-        elif auth_method == "apiToken":
-            print("Using email with API token auth method")
-        else:
-            print("Using cookie auth method")
+        connection_info = jira.connect()
+        if connection_info:
+            (server, auth_method) = connection_info
+            print(f"Connecting to {server}")
+            if auth_method == "pat":
+                print("Using personal access token auth method")
+            elif auth_method == "apiToken":
+                print("Using email with API token auth method")
+            else:
+                print("Using cookie auth method")
 
-        return True
+            return True
     except config.ConfigException as e:
         click.echo(Fore.RED + f"Configuration error: {e}")
-        # TODO: add message to run init
+        click.echo(Fore.LIGHTBLACK_EX + "You can try to run 'watson-jira init'")
     except jira.JiraException as e:
         click.echo(Fore.RED + f"JIRA error: {e}")
 
@@ -84,7 +86,10 @@ def check_connection():
         current_user = jira.test_conn()
         if current_user:
             click.echo(Fore.GREEN + f"Connected as {current_user}")
-            click.echo(Fore.LIGHTBLACK_EX + f"Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)")
+            click.echo(
+                Fore.LIGHTBLACK_EX
+                + f"Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)"
+            )
             return True
     except Exception:
         pass

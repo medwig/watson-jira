@@ -42,7 +42,7 @@ def log_day(date, tempo_format=False, is_interactive=False):
         stdout=PIPE,
         stderr=PIPE,
     )
-    stdout, _stderr = process.communicate()
+    stdout, _ = process.communicate()
     logs = json.loads(stdout.decode("ascii").strip())
     if tempo_format:
         logs = logs_to_worklogs(logs, is_interactive)
