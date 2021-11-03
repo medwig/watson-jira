@@ -60,7 +60,15 @@ def sync_logs(logs):
 
 def jira_connect():
     try:
-        jira.connect()
+        (server, auth_method) = jira.connect()
+        print(f"Connecting to {server}")
+        if auth_method == "pat":
+            print("Using personal access token auth method")
+        elif auth_method == "apiToken":
+            print("Using email with API token auth method")
+        else:
+            print("Using cookie auth method")
+
         return True
     except config.ConfigException as e:
         click.echo(Fore.RED + f"Configuration error: {e}")
@@ -68,6 +76,18 @@ def jira_connect():
     except jira.JiraException as e:
         click.echo(Fore.RED + f"JIRA error: {e}")
 
+    return False
+
+
+def check_connection():
+    try:
+        jira.connect()
+        current_user = jira.test_conn()
+        if current_user:
+            click.echo(Fore.GREEN + f"Connected as {current_user} and ready to go!")
+            return True
+    except Exception:
+        pass
     return False
 
 
@@ -135,18 +155,11 @@ def logs(**kwargs):
     click.echo(json.dumps(logs))
 
 
-# TODO: rewrite to init at least config
 @main.command()
+@click.option("--clean-existing", is_flag=True, help="override existing config")
 def init(**kwargs):
-    try:
-        # TODO: maybe check if config already exists, if yes ask if wants to override
-        jira.connect()
-        current_user = jira.test_conn()
-        if current_user:
-            click.echo(f'Configured as user="{current_user}" and ready to go!')
-            return
-    except config.ConfigException:
-        pass
+    if not kwargs["clean_existing"] and check_connection():
+        return
 
     data = {}
     data["jira"] = {}
@@ -158,7 +171,8 @@ def init(**kwargs):
   {Fore.RESET}1 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Email and Api token
   {Fore.RESET}2 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Cookie
 Your selection{Fore.RESET}""",
-        default=0,
+        type=int,
+        default="0",
     )
 
     if auth_method == 0:
@@ -173,7 +187,14 @@ Your selection{Fore.RESET}""",
         )
         data["jira"]["apiToken"] = click.prompt(Fore.BLUE + "Api token", type=str)
     elif auth_method == 2:
-        data["jira"]["cookie"] = click.prompt(Fore.BLUE + "Cookie", type=str)
+        click.echo(
+            Fore.LIGHTBLACK_EX
+            + "In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
+        )
+        cookie = click.prompt(Fore.BLUE + "Cookie", type=str)
+        if cookie.startswith("Cookie: "):
+            cookie = cookie[cookie.find(" ") + 1 :]
+        data["jira"]["cookie"] = cookie
     else:
         click.echo(Fore.RED + f"Invalid value")
         return
@@ -181,7 +202,13 @@ Your selection{Fore.RESET}""",
     data["mappings"] = []
 
     config.set(data)
-    click.echo(Fore.GREEN + "Configuration successfully initialized!")
+    jira.invalidate()
+
+    if not check_connection():
+        click.echo(
+            Fore.RED
+            + "Unable to fetch user's display name with provided configuration!"
+        )
 
 
 if __name__ == "__main__":

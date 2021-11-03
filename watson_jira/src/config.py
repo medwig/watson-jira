@@ -11,12 +11,14 @@ config = None
 
 
 def set(data):
+    global config
     try:
         # TODO: fix app name
         config_dir_path = BaseDirectory.save_config_path("watson-jir")
         path = os.path.join(config_dir_path, "config.yaml")
         stream = open(path, "w")
         yaml.safe_dump(data, stream)
+        config = None
     except Exception:
         raise ConfigException("Failed to write config file")
 
@@ -27,8 +29,9 @@ def get():
         try:
             # TODO: fix app name
             config_dir_path = BaseDirectory.load_first_config("watson-jir")
+            if config_dir_path == None:
+                raise ConfigException("Failed to find config dir")
             path = os.path.join(config_dir_path, "config.yaml")
-            print(path)
             stream = open(path)
         except Exception:
             raise ConfigException("Failed to open config file")
