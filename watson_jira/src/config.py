@@ -1,5 +1,6 @@
 import yaml
 import os
+from xdg import BaseDirectory
 
 
 class ConfigException(Exception):
@@ -9,11 +10,25 @@ class ConfigException(Exception):
 config = None
 
 
+def set(data):
+    try:
+        # TODO: fix app name
+        config_dir_path = BaseDirectory.save_config_path("watson-jir")
+        path = os.path.join(config_dir_path, "config.yaml")
+        stream = open(path, "w")
+        yaml.safe_dump(data, stream)
+    except Exception:
+        raise ConfigException("Failed to write config file")
+
+
 def get():
     global config
     if config is None:
         try:
-            path = os.path.expanduser("~/.config/watson-jira/config.yaml")
+            # TODO: fix app name
+            config_dir_path = BaseDirectory.load_first_config("watson-jir")
+            path = os.path.join(config_dir_path, "config.yaml")
+            print(path)
             stream = open(path)
         except Exception:
             raise ConfigException("Failed to open config file")

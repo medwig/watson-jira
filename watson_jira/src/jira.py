@@ -33,7 +33,7 @@ def connect():
                 headers["cookie"] = jiraconfig["cookie"]
                 jira = JIRA(server=jiraconfig["server"], options={"headers": headers})
 
-        except Eception as e:
+        except Exception:
             raise JiraException("Connection failed")
 
 

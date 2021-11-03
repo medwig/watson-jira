@@ -12,7 +12,7 @@ Will not double-write logs, and makes no local edits.
 
 ## Config
 
-Config is stored in `~/.config/watson-jira/config.yaml`.
+Config is stored in `$XDG_CONFIG_HOME/.config/watson-jira/config.yaml`.
 
 ### JIRA
 

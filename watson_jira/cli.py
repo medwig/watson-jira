@@ -64,6 +64,7 @@ def jira_connect():
         return True
     except config.ConfigException as e:
         click.echo(Fore.RED + f"Configuration error: {e}")
+        # TODO: add message to run init
     except jira.JiraException as e:
         click.echo(Fore.RED + f"JIRA error: {e}")
 
@@ -137,21 +138,50 @@ def logs(**kwargs):
 # TODO: rewrite to init at least config
 @main.command()
 def init(**kwargs):
-    current_user = jira.test_conn()
-    if current_user:
-        click.echo(f'Configured as user="{current_user}" and ready to go!')
-        return
-    print(
-        "create token here and copy to clipboard:\n>> https://id.atlassian.com/manage/api-tokens#\n"
+    try:
+        # TODO: maybe check if config already exists, if yes ask if wants to override
+        jira.connect()
+        current_user = jira.test_conn()
+        if current_user:
+            click.echo(f'Configured as user="{current_user}" and ready to go!')
+            return
+    except config.ConfigException:
+        pass
+
+    data = {}
+    data["jira"] = {}
+    data["jira"]["server"] = click.prompt(Fore.BLUE + "Jira server URL", type=str)
+
+    auth_method = click.prompt(
+        f"""{Fore.BLUE}Jira authentication method
+  {Fore.RESET}0 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Personal access token
+  {Fore.RESET}1 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Email and Api token
+  {Fore.RESET}2 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Cookie
+Your selection{Fore.RESET}""",
+        default=0,
     )
-    token = click.prompt("Jira token: ", type=str)
-    email = click.prompt("Jira email: ", type=str)
-    url = click.prompt("Jira url (example fooco.atlassian.net): ", type=str)
-    with open(os.path.expanduser("~/.config/watson-jira/.netrc"), "a+") as netrc:
-        netrc.writelines(
-            ["\n" f"machine {url}\n" f"login {email}\n" f"password {token}\n"]
+
+    if auth_method == 0:
+        data["jira"]["personalAccessToken"] = click.prompt(
+            Fore.BLUE + "Personal access token", type=str
         )
-    click.echo(Fore.YELLOW + "\n~\\.netrc written\nReady to go!")
+    elif auth_method == 1:
+        data["jira"]["email"] = click.prompt(Fore.BLUE + "Jira email", type=str)
+        click.echo(
+            Fore.LIGHTBLACK_EX
+            + "Create token at https://id.atlassian.com/manage/api-tokens#"
+        )
+        data["jira"]["apiToken"] = click.prompt(Fore.BLUE + "Api token", type=str)
+    elif auth_method == 2:
+        data["jira"]["cookie"] = click.prompt(Fore.BLUE + "Cookie", type=str)
+    else:
+        click.echo(Fore.RED + f"Invalid value")
+        return
+
+    data["mappings"] = []
+
+    config.set(data)
+    click.echo(Fore.GREEN + "Configuration successfully initialized!")
 
 
 if __name__ == "__main__":

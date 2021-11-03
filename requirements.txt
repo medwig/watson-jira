@@ -5,3 +5,4 @@ simplejson
 colorama
 jira
 pyyaml
+pyxdg
