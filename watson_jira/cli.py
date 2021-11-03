@@ -1,4 +1,3 @@
-import os
 import json
 from datetime import date
 
@@ -52,7 +51,7 @@ def sync_logs(logs):
         ):
             print(Fore.YELLOW + "already exists")
         else:
-            # jira.add_worklog(**log)
+            jira.add_worklog(**log)
             print(Fore.GREEN + "synced")
 
     return True
@@ -84,7 +83,8 @@ def check_connection():
         jira.connect()
         current_user = jira.test_conn()
         if current_user:
-            click.echo(Fore.GREEN + f"Connected as {current_user} and ready to go!")
+            click.echo(Fore.GREEN + f"Connected as {current_user}")
+            click.echo(Fore.LIGHTBLACK_EX + f"Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)")
             return True
     except Exception:
         pass
