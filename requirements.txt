@@ -1,9 +1,0 @@
-td-watson
-python-dateutil
-click >=7.0,<8.0
-simplejson
-colorama
-jira
-pyyaml
-pyxdg
-pytest

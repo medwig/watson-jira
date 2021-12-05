@@ -26,11 +26,12 @@ setup(
     install_requires=[
         "td-watson",
         "python-dateutil",
-        "click",
+        "click >=7.0,<8.0",
         "simplejson",
         "colorama",
         "jira",
-        "pyyaml"
+        "pyyaml",
+        "pyxdg"
     ],
     setup_requires=["pytest-runner"],
     tests_require=["pytest"],
