@@ -10,25 +10,12 @@ from watson_jira import cli
 def runner():
     return CliRunner()
 
+def test_sync(runner):
+    result = runner.invoke(cli.main, ["sync"])
+    assert result.exit_code == 0
 
 def test_logs(runner):
     result = runner.invoke(cli.main, ["logs"])
     assert result.exit_code == 0
-    assert isinstance(json.loads(result.output), list)
 
 
-def test_logs_jiraonly(runner):
-    result = runner.invoke(cli.main, ["logs", "--jira-only"])
-    assert result.exit_code == 0
-    assert isinstance(json.loads(result.output), list)
-
-
-def test_logs_tempoformat(runner):
-    result = runner.invoke(cli.main, ["logs", "--jira-only", "--tempo-format"])
-    assert result.exit_code == 0
-    assert isinstance(json.loads(result.output), list)
-
-
-def test_tempo_help(runner):
-    result = runner.invoke(cli.main, ["tempo", "-h"])
-    assert result.exit_code == 0
