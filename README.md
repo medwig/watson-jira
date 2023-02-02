@@ -106,7 +106,7 @@ For any Watson log, which doesn't match any of the mappings, the JIRA issue numb
 ```
 jira:
   server: http://localhost:8080
-  cookie: atlassian.xsrf.token=BEHZ-5GE9-RXNS-7J78_bfa98881ae96448d36fdaa94f2b3ac6b8f205885_lout; JSESSIONID=51D8547A4C356A8355F8FDAF7CC97D51
+  cookie: atlassian.xsrf.token=<redacted>; JSESSIONID=<redacted>
 mappings:
   - name: sprint
     type: issue_specified_in_tag
