@@ -1,53 +1,49 @@
 import json
-import re
 from subprocess import Popen, PIPE
+from datetime import datetime
+from colorama import Fore
+
+from watson_jira.src import mapper
 
 
-def is_jira_issue(string):
-    """Returns True if input string is a valid JIRA issue key, else False"""
-    jira_regex = r"^[A-Z]{1,10}-[0-9]+$"
-    return bool(re.match(jira_regex, string))
-
-
-def filter_jiras(report):
-    jira_projects = []
-    for project in report["projects"]:
-        if is_jira_issue(project["name"]):
-            jira_projects.append(project)
-    report["projects"] = jira_projects
-    return report
-
-
-def report_to_worklogs(report):
-    """Convert watson report to Tempo (Jira) worklog dictionaries"""
-    date = report["timespan"]["to"]
+def logs_to_worklogs(logs, is_interactive):
+    """Convert Watson logs to Tempo (Jira) worklog dictionaries"""
+    print(Fore.YELLOW + "Mapping watson logs to JIRA tickets")
     worklogs = []
-    for project in report["projects"]:
-        for tag in project["tags"]:
-            worklog = {
-                "issue": project["name"],
-                "started": date,
-                "comment": tag["name"],
-                "timeSpent": int(
-                    tag["time"] // 60 or 1
-                ),  # Watson logs in seconds, Jira in minutes
-            }
-            worklogs.append(worklog)
-    report["projects"] = worklogs
-    return report
+    for log in logs:
+        jira_issue = mapper.map(log["project"], log["tags"], is_interactive)
+        if jira_issue is None:
+            continue
+
+        worklog = {
+            "started": log["start"],
+            "issue": jira_issue,
+            "comment": get_comment(log["id"], log["project"], log["tags"]),
+            "timeSpent": get_time_spent(log["start"], log["stop"]),
+        }
+        worklogs.append(worklog)
+    return worklogs
 
 
-def report_day(date, jira_only=False, tempo_format=False):
-    """Get Watson report for a given date in JSON"""
+def get_comment(id, project, tags):
+    return "{0}\n{1} - [{2}]".format(id, project, ", ".join(tags))
+
+
+def get_time_spent(start, stop):
+    datetime_start = datetime.fromisoformat(start)
+    datetime_stop = datetime.fromisoformat(stop)
+    return int((datetime_stop - datetime_start).total_seconds() // 60 or 1)
+
+
+def log_day(date, tempo_format=False, is_interactive=False):
+    """Get Watson logs for given date in JSON"""
     process = Popen(
-        ["watson", "report", "--from", date, "--to", date, "--json"],
+        ["watson", "log", "--from", date, "--to", date, "--json"],
         stdout=PIPE,
         stderr=PIPE,
     )
-    stdout, _stderr = process.communicate()
-    report = json.loads(stdout.decode("ascii").strip())
-    if jira_only:
-        report = filter_jiras(report)
+    stdout, _ = process.communicate()
+    logs = json.loads(stdout.decode("ascii").strip())
     if tempo_format:
-        report = report_to_worklogs(report)
-    return report["projects"]
+        logs = logs_to_worklogs(logs, is_interactive)
+    return logs
