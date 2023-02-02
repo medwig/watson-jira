@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/PrimaMateria/watson-jira-next/tree/master.svg?style=svg)](https://circleci.com/gh/PrimaMateria/watson-jira-next/tree/master)
+[![CircleCI](https://circleci.com/gh/medwig/watson-jira/tree/master.svg?style=svg)](https://circleci.com/gh/medwig/watson-jira/tree/master)
 
 # Watson-Jira
 
