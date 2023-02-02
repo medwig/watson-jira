@@ -42,9 +42,9 @@ personalAccessToken: <<PAT>>
 #### Auth: Cookie
 
 1. login to JIRA in the browser
-1. open Network tab in the developer tools
-1. copy the cookie from the request header 
-1. add the following to the config file:
+2. open Network tab in the developer tools
+3. copy the cookie from the request header 
+4. add the following to the config file:
 
 ```
 cookie: <<cookie>>
