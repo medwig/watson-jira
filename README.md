@@ -14,12 +14,12 @@ Will not double-write logs, and makes no local edits.
 
 Config is stored in `$XDG_CONFIG_HOME/.config/watson-jira/config.yaml`.
 
-### JIRA
+### Jira
 
-`jira` section should contain JIRA base URL and one of the authentication methods.
+`jira` section should contain Jira base URL and one of the authentication methods.
 
 ```
-server: <<JIRA base URL>>
+server: <<Jira base URL>>
 ```
 
 #### Auth: API token
@@ -41,7 +41,7 @@ personalAccessToken: <<PAT>>
 
 #### Auth: Cookie
 
-1. login to JIRA in the browser
+1. login to Jira in the browser
 2. open Network tab in the developer tools
 3. copy the cookie from the request header 
 4. add the following to the config file:
@@ -54,7 +54,7 @@ cookie: <<cookie>>
 
 `mappings` section contains list of mapping rules.
 
-Mapping rule has name and type. For each Watson log, **Watson-Jira** tries to find the name in the tags. If found, then the JIRA issue number is resolved according to the type definition.
+Mapping rule has name and type. For each Watson log, **Watson-Jira** tries to find the name in the tags. If found, then the Jira issue number is resolved according to the type definition.
 
 Mapping precedence is of the following order:
 
@@ -66,7 +66,7 @@ type: single_issue
 issue: JIRA-1
 ```
 
-This type always returns the one specified JIRA issue number.
+This type always returns the one specified Jira issue number.
 
 **Watson example:** `watson add -f 10:00 -t 18:00 none +vacation`
 
@@ -80,26 +80,24 @@ projects:
   project2: JIRA-3
 ```
 
-This type returns JIRA issue number based on the project name.
+This type returns Jira issue number based on the project name.
 
 **Watson example:** `watson add -f 10:00 -t 11:00 project2 +maintenance +dependencies-upgrade`
 
 #### Issue specified in the tag
 
-```
-name: sprint
-type: issue_specified_in_tag
-```
+If no mapping is set then it will default to resolving the Jira issue number from the first tag which matches the issue number regex.
 
-This type resolves the JIRA issue number from the first tag which matches the issue number regex.
-
-**Example:** `watson add -f 10:00 -t 11:00 project1 +sprint +JIRA-123 +code`
+**Watson example:** `watson add -f 10:00 -t 11:00 project1 +sprint +JIRA-123 +code`
 
 #### Issue specified in the project name
 
-For any Watson log, which doesn't match any of the mappings, the JIRA issue number will be tried to be resolved from the project name.
+For any Watson log, which doesn't match any of the mappings, the Jira issue number will be tried to be resolved from the project name.
+If the Jira issue number is set in both the project name _and_ in a tag then the project name will be used.
+Jira issue numbers are intended to be set in the tags, this behaviour is here for backwards compatibility. 
 
 **Watson example:** `watson add -f 10:00 -t 11:00 JIRA-123 +investigation`
+**Watson example:** `watson add -f 10:00 -t 11:00 JIRA-123 +investigation +JIRA-2` # JIRA-123 will be used, not JIRA-2
 
 ### Full config example
 
@@ -108,8 +106,6 @@ jira:
   server: http://localhost:8080
   cookie: atlassian.xsrf.token=<redacted>; JSESSIONID=<redacted>
 mappings:
-  - name: sprint
-    type: issue_specified_in_tag
   - name: vacation
     type: single_issue
     issue: HR-123
