@@ -35,8 +35,17 @@ class JiraHandler:
     def delete_worklog(issue, worklog_id):
         jira_handler.delete_worklog(issue, worklog_id)
 
+    @staticmethod
+    def delete_worklogs(issue, worklogs):
+        for worklog in JiraHandler.get_worklogs(ISSUE, FROM):
+            print(worklog)
+            JiraHandler.delete_worklog(issue, worklog["id"])
+
 
 def test_jira():
+    worklogs = JiraHandler.get_worklogs(ISSUE, FROM)
+    print(worklogs)
+    JiraHandler.delete_worklogs(ISSUE, FROM)
     worklogs = JiraHandler.get_worklogs(ISSUE, FROM)
     print(worklogs)
     # for worklog in worklogs:
