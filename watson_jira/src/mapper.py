@@ -47,7 +47,7 @@ def map(project, tags, is_interactive):
             jira_issue = process_issue_specified_in_tag(tags)
 
     # backward compatibility - resolve jira issue from project name
-    if jira_issue is None and is_jira_issue(project):
+    if is_jira_issue(project):
         jira_issue = project
 
     # print the status
