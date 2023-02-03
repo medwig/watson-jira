@@ -135,6 +135,36 @@ def sync(**kwargs):
 
         print(Fore.CYAN + "\nSynchronization finished\n" + Fore.RESET)
 
+@main.command()
+@click.argument("issue")
+@click.option(
+    "--interactive",
+    is_flag=True,
+    help="enable propmts to delete worklogs for target issue",
+)
+def delete(**kwargs):
+    if jira_connect():
+        issue = kwargs["issue"]
+        is_interactive = kwargs["interactive"]
+
+        worklogs = jira.get_worklogs(issue)
+        print(Fore.YELLOW + f"\nDeleting {len(worklogs)} worklogs from Jira issue {issue}")
+        for wl in worklogs:
+            if is_interactive:
+                click.echo(
+                    f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
+                )
+                if click.confirm("Continue?"):
+                    jira.delete_worklog(issue, wl["id"])
+                else:
+                    click.echo("Skipping")
+            else:
+                jira.delete_worklog(issue, wl["id"])
+
+        print(Fore.CYAN + "\nDeletion Finished \n" + Fore.RESET)
+
+
+
 
 @main.command()
 @click.option(
