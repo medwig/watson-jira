@@ -2,61 +2,54 @@ import json
 import re
 from subprocess import Popen, PIPE
 
-# from click.testing import CliRunner
+from click.testing import CliRunner
 import pytest
 
 from watson_jira import cli
 
-from watson_jira.src import jira as jira_handler
+import watson_jira.src.jira
 
 FROM = "10:00"
 TO = "11:00"
+TIME_SPENT = '1h'
 PROJECT = "WAT"
 ISSUE = "WAT-3"
 TAG_NAME = "IntegrationTest"
 
 
-class OutputParser:
-    FRAME_ID_PATTERN = re.compile(r"id: (?P<frame_id>[0-9a-f]+)")
-
-    @staticmethod
-    def get_frame_id(output):
-        return OutputParser.FRAME_ID_PATTERN.search(output).group("frame_id")
-
+@pytest.fixture(scope="module")
+def runner():
+    return CliRunner()
 
 class JiraHandler:
     @staticmethod
-    def get_worklogs(issue, start):
-        jira_handler.connect()
-        worklogs = jira_handler.get_worklogs(issue)
+    def get_worklogs(issue):
+        watson_jira.src.jira.connect()
+        worklogs = watson_jira.src.jira.get_worklogs(issue)
+        print('Worklogs: ', worklogs)
         return worklogs
 
     @staticmethod
     def delete_worklog(issue, worklog_id):
-        jira_handler.delete_worklog(issue, worklog_id)
+        watson_jira.src.jira.delete_worklog(issue, worklog_id)
+        print('Worklog deleted: ', issue, worklog_id)
 
     @staticmethod
-    def delete_worklogs(issue, worklogs):
-        for worklog in JiraHandler.get_worklogs(ISSUE, FROM):
-            print(worklog)
+    def delete_worklogs(issue):
+        worklogs = JiraHandler.get_worklogs(issue)
+        if not worklogs:
+            print('No worklogs to delete.')
+            return None
+        for worklog in worklogs:
+            print('Deleting worklog:', issue, worklog["id"])
             JiraHandler.delete_worklog(issue, worklog["id"])
+        print('Worklogs deleted.')
 
 
-def test_jira():
-    worklogs = JiraHandler.get_worklogs(ISSUE, FROM)
-    print(worklogs)
-    JiraHandler.delete_worklogs(ISSUE, FROM)
-    worklogs = JiraHandler.get_worklogs(ISSUE, FROM)
-    print(worklogs)
-    # for worklog in worklogs:
-    #     print(worklog)
-    # for worklog in worklogs:
-    #     JiraHandler.delete_worklog(TAG_ISSUE, worklog["id"])
-    # worklogs = JiraHandler.get_worklogs(TAG_ISSUE, FROM)
-    # assert len(worklogs) == 0
 class WatsonHandler:
     @staticmethod
     def run(cmd):
+        print('Running: ', cmd, '...')
         process = Popen(
             cmd.split(),
             stdout=PIPE,
@@ -76,6 +69,7 @@ class WatsonHandler:
             and ISSUE in log["tags"]
             and TAG_NAME in log["tags"]
         ]
+        print('Test logs: ', test_logs)
         return test_logs
 
     @staticmethod
@@ -89,41 +83,30 @@ class WatsonHandler:
         for log in test_logs:
             cmd = f"watson remove -f {log['id']}"
             WatsonHandler.run(cmd)
+        print('Test logs removed.')
 
 
-@pytest.fixture(scope="module")
-def runner():
-    return CliRunner()
-
-# @pytest.fixture(scope="module")
-def test_init_logs():
-    print("init_logs")
-    WatsonHandler.create_test_log()
-    test_logs = WatsonHandler.get_test_logs()
-    print(test_logs)
+def test_sync_log_to_jira(runner):
+    # create fresh test logs
     WatsonHandler.remove_test_logs()
-    test_logs = WatsonHandler.get_test_logs()
-    print(test_logs)
+    WatsonHandler.create_test_log()
 
-    # assert result.exit_code == 0
-    # assert OutputParser.get_start_date(watson, result.output) == 'foo'
-    return
-
-
-# get card details for IntegationTest (WAT-3)
-# https://medwig.atlassian.net/rest/api/3/issue/WAT-3
-# delete all time tracking for WAT-3
-# create new watson log for WAT-3
-# sync watson logs to Jira for WAT-3
-# get card details for IntegationTest (WAT-3)
-# confirm that time tracking is correct for WAT-3
-
-
-def test_logs(runner):
-    result = runner.invoke(cli.main, ["logs"])
+    print('Running sync to Jira for issue ', ISSUE, '...')
+    result = runner.invoke(cli.main, ["sync", "--issue", ISSUE])
     assert result.exit_code == 0
+
+    worklogs = JiraHandler.get_worklogs(ISSUE)
+    assert len(worklogs) == 1
+    assert worklogs[0]["timeSpent"] == TIME_SPENT
+    assert worklogs[0]["issue"] == ISSUE
+
+    # clean up
+    WatsonHandler.remove_test_logs()
+    JiraHandler.delete_worklogs(ISSUE)
+
+    assert WatsonHandler.get_test_logs() == []
+    assert JiraHandler.get_worklogs(ISSUE) == []
 
 
 if __name__ == "__main__":
-    # test_init_logs()
-    test_jira()
+    test_sync_log_to_jira()

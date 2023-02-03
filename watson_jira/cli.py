@@ -164,8 +164,6 @@ def delete(**kwargs):
         print(Fore.CYAN + "\nDeletion Finished \n" + Fore.RESET)
 
 
-
-
 @main.command()
 @click.option(
     "--issue", default=None, required=True, help="get worklogs from this issue"
