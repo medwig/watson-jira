@@ -5,14 +5,14 @@ from subprocess import Popen, PIPE
 # from click.testing import CliRunner
 import pytest
 
-# from jira import JIRA
-
 from watson_jira import cli
+
+from watson_jira.src import jira as jira_handler
 
 FROM = "10:00"
 TO = "11:00"
 PROJECT = "WAT"
-TAG_ISSUE = "WAT-3"
+ISSUE = "WAT-3"
 TAG_NAME = "IntegrationTest"
 
 
@@ -24,6 +24,27 @@ class OutputParser:
         return OutputParser.FRAME_ID_PATTERN.search(output).group("frame_id")
 
 
+class JiraHandler:
+    @staticmethod
+    def get_worklogs(issue, start):
+        jira_handler.connect()
+        worklogs = jira_handler.get_worklogs(issue)
+        return worklogs
+
+    @staticmethod
+    def delete_worklog(issue, worklog_id):
+        jira_handler.delete_worklog(issue, worklog_id)
+
+
+def test_jira():
+    worklogs = JiraHandler.get_worklogs(ISSUE, FROM)
+    print(worklogs)
+    # for worklog in worklogs:
+    #     print(worklog)
+    # for worklog in worklogs:
+    #     JiraHandler.delete_worklog(TAG_ISSUE, worklog["id"])
+    # worklogs = JiraHandler.get_worklogs(TAG_ISSUE, FROM)
+    # assert len(worklogs) == 0
 class WatsonHandler:
     @staticmethod
     def run(cmd):
@@ -43,14 +64,14 @@ class WatsonHandler:
             log
             for log in logs
             if log["project"] == PROJECT
-            and TAG_ISSUE in log["tags"]
+            and ISSUE in log["tags"]
             and TAG_NAME in log["tags"]
         ]
         return test_logs
 
     @staticmethod
     def create_test_log():
-        cmd = f"watson add -f {FROM} -t {TO} {PROJECT} +{TAG_ISSUE} +{TAG_NAME}"
+        cmd = f"watson add -f {FROM} -t {TO} {PROJECT} +{ISSUE} +{TAG_NAME}"
         WatsonHandler.run(cmd)
 
     @staticmethod
@@ -64,7 +85,6 @@ class WatsonHandler:
 @pytest.fixture(scope="module")
 def runner():
     return CliRunner()
-
 
 # @pytest.fixture(scope="module")
 def test_init_logs():
@@ -96,4 +116,5 @@ def test_logs(runner):
 
 
 if __name__ == "__main__":
-    test_init_logs()
+    # test_init_logs()
+    test_jira()
