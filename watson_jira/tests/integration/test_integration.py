@@ -1,5 +1,5 @@
 import json
-import re
+import os
 from subprocess import Popen, PIPE
 
 from click.testing import CliRunner
@@ -8,6 +8,10 @@ import pytest
 from watson_jira import cli
 
 import watson_jira.src.jira
+
+# Skip integration tests if not running on GitHub Actions
+if not os.getenv("GITHUB_ACTIONS", "False").lower() == 'true':
+    pytest.skip("skipping integration tests", allow_module_level=True)
 
 FROM = "10:00"
 TO = "11:00"
