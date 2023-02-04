@@ -136,7 +136,7 @@ def sync(**kwargs):
         print(Fore.CYAN + "\nSynchronization finished\n" + Fore.RESET)
 
 @main.command()
-@click.argument("issue")
+@click.option("--issue", required=True, help="issue to delete worklogs from (on Jira server only)")
 @click.option(
     "--interactive",
     is_flag=True,
