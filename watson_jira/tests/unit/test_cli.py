@@ -11,7 +11,7 @@ def runner():
     return CliRunner()
 
 def test_sync(runner):
-    result = runner.invoke(cli.main, ["sync"])
+    result = runner.invoke(cli.main, ["sync", "--issue", "WAT-3"])
     assert result.exit_code == 0
 
 def test_logs(runner):

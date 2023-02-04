@@ -50,6 +50,14 @@ def get_worklog(issue, _id):
     return vars(worklog)
 
 
+def delete_worklog(issue, id):
+    global jira
+    if jira is None:
+        raise JiraException("Jira not connected")
+    worklog = jira.worklog(issue, id)
+    worklog.delete()
+
+
 def get_worklogs(issue):
     global jira
     if jira is None:
