@@ -102,6 +102,9 @@ def test_sync_log_to_jira(runner):
 
     # clean up
     WatsonHandler.remove_test_logs()
+    # for reasons unknown, using the cli runner here will do nothing, despite the exit code being 0
+    # in fact when running *any* cli commands here, only the first will execute
+    # so the library is used instead
     JiraHandler.delete_worklogs(ISSUE)
 
     assert WatsonHandler.get_test_logs() == []
