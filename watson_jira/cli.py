@@ -4,7 +4,7 @@ from datetime import date
 import colorama
 import click
 import simplejson
-from colorama import Fore, Style
+from colorama import Fore
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import DAILY, rrule
 from dateutil.parser import parse
@@ -132,7 +132,7 @@ def sync(**kwargs):
         datelist = [date]
 
     for date in datelist:
-        click.echo('\n' + Fore.CYAN + Style.NORMAL + f'{date}')
+        click.echo('\n' + Fore.CYAN + f'{date}')
         logs = watson.log_day(
             date, tempo_format=True, is_interactive=is_interactive
         )
