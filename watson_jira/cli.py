@@ -99,7 +99,9 @@ def check_connection():
         current_user = jira.test_conn()
         if current_user:
             click.echo(GREEN + f'Connected as {current_user}')
-            click.echo(f'{LIGHTBLACK_EX}Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)')
+            click.echo(
+                f'{LIGHTBLACK_EX}Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)'
+            )
             return True
     except Exception:
         pass
