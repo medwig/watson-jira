@@ -9,6 +9,14 @@ Will not double-write logs, and makes no local edits.
 
 `$ pip install watson-jira`
 
+## Quickstart
+
+1. Set up Jira authentication:
+   `watson-jira init`
+2. Create a watson log with a Jira issue number in the tags:
+   `watson add -f 10:00 -t 11:00 project1 +sprint +JIRA-123 +code`
+3. Sync the logs to Jira:
+   `watson-jira sync`
 
 ## Config
 
@@ -43,14 +51,14 @@ personalAccessToken: <<PAT>>
 
 1. login to Jira in the browser
 2. open Network tab in the developer tools
-3. copy the cookie from the request header 
+3. copy the cookie from the request header
 4. add the following to the config file:
 
 ```
 cookie: <<cookie>>
 ```
 
-### Mappings 
+### Mappings
 
 `mappings` section contains list of mapping rules.
 
@@ -94,10 +102,11 @@ If no mapping is set then it will default to resolving the Jira issue number fro
 
 For any Watson log, which doesn't match any of the mappings, the Jira issue number will be tried to be resolved from the project name.
 If the Jira issue number is set in both the project name _and_ in a tag then the project name will be used.
-Jira issue numbers are intended to be set in the tags, this behaviour is here for backwards compatibility. 
+Jira issue numbers are intended to be set in the tags, this behaviour is here for backwards compatibility.
 
 **Watson example:** `watson add -f 10:00 -t 11:00 JIRA-123 +investigation`
-**Watson example:** `watson add -f 10:00 -t 11:00 JIRA-123 +investigation +JIRA-2` # JIRA-123 will be used, not JIRA-2
+**Watson example:** `watson add -f 10:00 -t 11:00 JIRA-123 +investigation +JIRA-2`
+--> JIRA-123 will be used, not JIRA-2, since the project name takes precedence.
 
 ### Full config example
 
@@ -118,21 +127,27 @@ mappings:
 
 ## Usage
 
-#### Show Jira-specific logs from today
+#### Show Watson logs from today
 
-`$ watson-jira logs --jira-only --tempo-format`
+`$ watson-jira logs`
 
-#### Show existing work logs for a Jira issue
+#### Show Watson logs in Jira Tempo format
 
-`$ watson-jira logs tempo --issue JIRA-1`
+`$ watson-jira logs --tempo-format`
 
-#### Upload logs from today interactively
+#### Upload logs from today to Jira
+
+`$ watson-jira sync`
+
+#### Upload logs from last 3 days interactively
 
 `$ watson-jira sync --from 3 --interactive`
 
-#### Upload logs from the last 3 days
+#### Delete Jira tempo logs for an issue
 
-`$ watson-jira sync --from 3`
+`$ watson-jira delete --issue FOO-1`
+
+Note that this will delete all Jira worklogs for the issue, not just the ones synced by Watson-Jira. It will _not_ delete any Watson logs, Watson-Jira is readonly for Watson logs.
 
 #### Help
 
