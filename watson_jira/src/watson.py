@@ -8,25 +8,25 @@ from watson_jira.src import mapper
 
 def logs_to_worklogs(logs, is_interactive):
     """Convert Watson logs to Tempo (Jira) worklog dictionaries"""
-    print(Fore.YELLOW + "Mapping watson logs to JIRA tickets")
+    print(Fore.YELLOW + 'Mapping watson logs to JIRA tickets')
     worklogs = []
     for log in logs:
-        jira_issue = mapper.map(log["project"], log["tags"], is_interactive)
+        jira_issue = mapper.map(log['project'], log['tags'], is_interactive)
         if jira_issue is None:
             continue
 
         worklog = {
-            "started": log["start"],
-            "issue": jira_issue,
-            "comment": get_comment(log["id"], log["project"], log["tags"]),
-            "timeSpent": get_time_spent(log["start"], log["stop"]),
+            'started': log['start'],
+            'issue': jira_issue,
+            'comment': get_comment(log['id'], log['project'], log['tags']),
+            'timeSpent': get_time_spent(log['start'], log['stop']),
         }
         worklogs.append(worklog)
     return worklogs
 
 
 def get_comment(id, project, tags):
-    return "{0}\n{1} - [{2}]".format(id, project, ", ".join(tags))
+    return '{0}\n{1} - [{2}]'.format(id, project, ', '.join(tags))
 
 
 def get_time_spent(start, stop):
@@ -38,12 +38,12 @@ def get_time_spent(start, stop):
 def log_day(date, tempo_format=False, is_interactive=False):
     """Get Watson logs for given date in JSON"""
     process = Popen(
-        ["watson", "log", "--from", date, "--to", date, "--json"],
+        ['watson', 'log', '--from', date, '--to', date, '--json'],
         stdout=PIPE,
         stderr=PIPE,
     )
     stdout, _ = process.communicate()
-    logs = json.loads(stdout.decode("ascii").strip())
+    logs = json.loads(stdout.decode('ascii').strip())
     if tempo_format:
         logs = logs_to_worklogs(logs, is_interactive)
     return logs

@@ -11,3 +11,4 @@ python setup.py install
 pip install -e .
 ```
 
+The code formatter for this project is [blue](https://pypi.org/project/blue/).
