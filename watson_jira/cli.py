@@ -49,7 +49,7 @@ def sync_logs(logs):
         started_formatted = started_datetime.strftime('%H:%M')
         click.echo(
             f"{BLUE}{log['issue']}{RESET} at {GREEN}{started_formatted}{RESET} {log['timeSpent']}m ",
-            end='',
+            nl=False,
         )
 
         worklogs = jira.get_worklogs(log['issue'])
