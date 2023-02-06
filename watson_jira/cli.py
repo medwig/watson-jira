@@ -4,7 +4,7 @@ from datetime import date
 import colorama
 import click
 import simplejson
-from colorama import Fore, Style
+from colorama import Fore
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import DAILY, rrule
 from dateutil.parser import parse
@@ -16,6 +16,15 @@ colorama.init(autoreset=True)
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 TODAY = date.today()
 TODAY_YMD = TODAY.strftime('%Y-%m-%d')
+
+# colors
+YELLOW = Fore.YELLOW
+BLUE = Fore.BLUE
+RESET = Fore.RESET
+GREEN = Fore.GREEN
+RED = Fore.RED
+LIGHTBLACK_EX = Fore.LIGHTBLACK_EX
+CYAN = Fore.CYAN
 
 
 def to_ymd(datestring):
@@ -31,16 +40,16 @@ def dates_from(days_ago):
 
 def sync_logs(logs):
     if not logs:
-        print('No logs')
+        click.echo('No logs')
     else:
-        print(Fore.YELLOW + '\nSyncing to JIRA')
+        click.echo(f'\n{YELLOW}Syncing to JIRA')
 
     for log in logs:
         started_datetime = parse(log['started'])
         started_formatted = started_datetime.strftime('%H:%M')
-        print(
-            f"{Fore.BLUE}{log['issue']}{Fore.RESET} at {Fore.GREEN}{started_formatted}{Fore.RESET} {log['timeSpent']}m ",
-            end='',
+        click.echo(
+            f"{BLUE}{log['issue']}{RESET} at {GREEN}{started_formatted}{RESET} {log['timeSpent']}m ",
+            nl=False,
         )
 
         worklogs = jira.get_worklogs(log['issue'])
@@ -51,10 +60,10 @@ def sync_logs(logs):
                 for wl in worklogs
             ]
         ):
-            print(Fore.YELLOW + 'already exists')
+            click.echo(f'{YELLOW}already exists')
         else:
             jira.add_worklog(**log)
-            print(Fore.GREEN + 'synced')
+            click.echo(f'{GREEN}synced')
 
     return True
 
@@ -64,22 +73,22 @@ def jira_connect():
         connection_info = jira.connect()
         if connection_info:
             (server, auth_method) = connection_info
-            print(f'Connecting to {server}')
+            click.echo(f'Connecting to {server}')
             if auth_method == 'pat':
-                print('Using personal access token auth method')
+                click.echo('Using personal access token auth method')
             elif auth_method == 'apiToken':
-                print('Using email with API token auth method')
+                click.echo('Using email with API token auth method')
             else:
-                print('Using cookie auth method')
+                click.echo('Using cookie auth method')
 
             return True
     except config.ConfigException as e:
-        click.echo(Fore.RED + f'Configuration error: {e}')
-        click.echo(
-            Fore.LIGHTBLACK_EX + "You can try to run 'watson-jira init'"
-        )
+        click.echo(f'{RED}Configuration error: {e}')
+        click.echo(f"{LIGHTBLACK_EX}You can try to run 'watson-jira init'")
     except jira.JiraException as e:
-        click.echo(Fore.RED + f'JIRA error: {e}')
+        click.echo(f'{RED}JIRA error: {e}')
+    except Exception as e:
+        click.echo(f'{RED}Unknown error: {e}')
 
     return False
 
@@ -89,10 +98,9 @@ def check_connection():
         jira.connect()
         current_user = jira.test_conn()
         if current_user:
-            click.echo(Fore.GREEN + f'Connected as {current_user}')
+            click.echo(GREEN + f'Connected as {current_user}')
             click.echo(
-                Fore.LIGHTBLACK_EX
-                + f'Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)'
+                f'{LIGHTBLACK_EX}Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)'
             )
             return True
     except Exception:
@@ -109,37 +117,37 @@ def main():
 @main.command()
 @click.option('--date', default=None, help='date to sync logs')
 @click.option(
-    '--from', default=0, type=int, help='sync logs from this long ago'
+    '--from', default=0, type=int, help='sync logs from this many days ago'
 )
 @click.option('--issue', default=None, help='only sync logs for this issue')
 @click.option(
     '--interactive',
     is_flag=True,
-    help='enable propmts to confirm or change target issue',
+    help='enable prompts to confirm or change target issue',
 )
 def sync(**kwargs):
-    if jira_connect():
-        days_ago = kwargs['from']
-        date = kwargs['date']
-        issue = kwargs['issue']
-        is_interactive = kwargs['interactive']
+    if not jira_connect():
+        return
+    days_ago = kwargs['from']
+    date = kwargs['date']
+    issue = kwargs['issue']
+    is_interactive = kwargs['interactive']
 
-        datelist = dates_from(days_ago)
-        if date:  # specific date trumps a range
-            datelist = [date]
+    datelist = dates_from(days_ago)
+    if date:  # specific date trumps a range
+        datelist = [date]
 
-        for date in datelist:
-            print()
-            print(Fore.CYAN + Style.NORMAL + f'{date}')
-            logs = watson.log_day(
-                date, tempo_format=True, is_interactive=is_interactive
-            )
-            if issue:
-                logs = [l for l in logs if l['issue'] == issue]
+    for date in datelist:
+        click.echo(f'\n{CYAN}{date}')
+        logs = watson.log_day(
+            date, tempo_format=True, is_interactive=is_interactive
+        )
+        if issue:
+            logs = [l for l in logs if l['issue'] == issue]
 
-            sync_logs(logs)
+        sync_logs(logs)
 
-        print(Fore.CYAN + '\nSynchronization finished\n' + Fore.RESET)
+    click.echo(f'\n{CYAN}Synchronization finished{RESET}\n')
 
 
 @main.command()
@@ -154,50 +162,54 @@ def sync(**kwargs):
     help='enable propmts to delete worklogs for target issue',
 )
 def delete(**kwargs):
-    if jira_connect():
-        issue = kwargs['issue']
-        is_interactive = kwargs['interactive']
+    if not jira_connect():
+        return
+    issue = kwargs['issue']
+    is_interactive = kwargs['interactive']
 
-        worklogs = jira.get_worklogs(issue)
-        print(
-            Fore.YELLOW
-            + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
-        )
-        for wl in worklogs:
-            if is_interactive:
-                click.echo(
-                    f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
-                )
-                if click.confirm('Continue?'):
-                    jira.delete_worklog(issue, wl['id'])
-                else:
-                    click.echo('Skipping')
-            else:
+    worklogs = jira.get_worklogs(issue)
+    click.echo(
+        f'\n{YELLOW}Deleting {len(worklogs)} worklogs from Jira issue {issue}'
+    )
+    for wl in worklogs:
+        if is_interactive:
+            click.echo(
+                f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
+            )
+            if click.confirm('Continue?'):
                 jira.delete_worklog(issue, wl['id'])
+            else:
+                click.echo('Skipping')
+        else:
+            jira.delete_worklog(issue, wl['id'])
 
-        print(Fore.CYAN + '\nDeletion Finished \n' + Fore.RESET)
+    click.echo(f'\n{CYAN}Deletion Finished{RESET}\n')
 
 
 @main.command()
 @click.option(
-    '--issue', default=None, required=True, help='get worklogs from this issue'
+    '--issue',
+    default=None,
+    required=True,
+    help='get Jira worklogs for this issue',
 )
 @click.option('--id', default=None, help='get specific worklog by id')
 def tempo(**kwargs):
-    if jira_connect():
-        issue = kwargs['issue']
-        _id = kwargs['id']
-        if _id:
-            worklogs = jira.get_worklog(issue, _id)
-        else:
-            worklogs = jira.get_worklogs(issue)
-        click.echo(simplejson.dumps(worklogs, skipkeys=True))
+    if not jira_connect():
+        return
+    issue = kwargs['issue']
+    _id = kwargs['id']
+    if _id:
+        worklogs = jira.get_worklog(issue, _id)
+    else:
+        worklogs = jira.get_worklogs(issue)
+    click.echo(simplejson.dumps(worklogs, skipkeys=True))
 
 
 @main.command()
-@click.option('--date', default=TODAY_YMD, help='date to get logs')
+@click.option('--date', default=TODAY_YMD, help='date to get Watson logs')
 @click.option(
-    '--tempo-format', is_flag=True, help='format logs for tempo timesheet'
+    '--tempo-format', is_flag=True, help='format logs for tempo (Jira format)'
 )
 def logs(**kwargs):
     logs = watson.log_day(kwargs['date'], kwargs['tempo_format'])
@@ -214,46 +226,38 @@ def init(**kwargs):
 
     data = {}
     data['jira'] = {}
-    data['jira']['server'] = click.prompt(
-        Fore.BLUE + 'Jira server URL', type=str
-    )
+    data['jira']['server'] = click.prompt(BLUE + 'Jira server URL', type=str)
 
     auth_method = click.prompt(
-        f"""{Fore.BLUE}Jira authentication method
-  {Fore.RESET}0 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Personal access token
-  {Fore.RESET}1 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Email and Api token
-  {Fore.RESET}2 {Fore.LIGHTBLACK_EX}={Fore.BLUE} Cookie
-Your selection{Fore.RESET}""",
+        f"""{BLUE}Jira authentication method
+  {RESET}0 {LIGHTBLACK_EX}={BLUE} Personal access token
+  {RESET}1 {LIGHTBLACK_EX}={BLUE} Email and Api token
+  {RESET}2 {LIGHTBLACK_EX}={BLUE} Cookie
+Your selection{RESET}""",
         type=int,
         default='0',
     )
 
     if auth_method == 0:
         data['jira']['personalAccessToken'] = click.prompt(
-            Fore.BLUE + 'Personal access token', type=str
+            f'{BLUE}Personal access token', type=str
         )
     elif auth_method == 1:
-        data['jira']['email'] = click.prompt(
-            Fore.BLUE + 'Jira email', type=str
-        )
+        data['jira']['email'] = click.prompt(BLUE + 'Jira email', type=str)
         click.echo(
-            Fore.LIGHTBLACK_EX
-            + 'Create token at https://id.atlassian.com/manage/api-tokens#'
+            f'{LIGHTBLACK_EX}Create token at https://id.atlassian.com/manage/api-tokens#'
         )
-        data['jira']['apiToken'] = click.prompt(
-            Fore.BLUE + 'Api token', type=str
-        )
+        data['jira']['apiToken'] = click.prompt(f'{BLUE}Api token', type=str)
     elif auth_method == 2:
         click.echo(
-            Fore.LIGHTBLACK_EX
-            + "In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
+            f"{LIGHTBLACK_EX}In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
         )
-        cookie = click.prompt(Fore.BLUE + 'Cookie', type=str)
+        cookie = click.prompt(f'{BLUE}Cookie', type=str)
         if cookie.startswith('Cookie: '):
             cookie = cookie[cookie.find(' ') + 1 :]
         data['jira']['cookie'] = cookie
     else:
-        click.echo(Fore.RED + f'Invalid value')
+        click.echo(f'{RED}Invalid value')
         return
 
     data['mappings'] = []
@@ -263,8 +267,7 @@ Your selection{Fore.RESET}""",
 
     if not check_connection():
         click.echo(
-            Fore.RED
-            + "Unable to fetch user's display name with provided configuration!"
+            f"{RED}Unable to fetch user's Jira display name with provided configuration!"
         )
 
 
