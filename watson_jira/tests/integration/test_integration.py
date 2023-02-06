@@ -36,7 +36,8 @@ class JiraHandler:
 
     @staticmethod
     def delete_worklog(issue, worklog_id):
-        watson_jira.src.jira.delete_worklog(issue, worklog_id)
+        wl = watson_jira.src.jira.get_worklog(issue, worklog_id)
+        wl.delete()
         print('Worklog deleted: ', issue, worklog_id)
 
     @staticmethod
