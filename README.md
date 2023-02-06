@@ -147,4 +147,3 @@ mappings:
 
 `$ watson-jira --help`
 
-Will install TD-Watson https://github.com/TailorDev/Watson as one of its dependencies, not surprisingly.

@@ -24,7 +24,6 @@ setup(
     license='MIT',
     packages=['watson_jira', 'watson_jira.src'],
     install_requires=[
-        'td-watson',
         'python-dateutil',
         'click==8.1.3',
         'simplejson',
