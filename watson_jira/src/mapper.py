@@ -4,6 +4,13 @@ from colorama import Fore
 
 from watson_jira.src import config
 
+# colors
+BLUE = Fore.BLUE
+RESET = Fore.RESET
+GREEN = Fore.GREEN
+RED = Fore.RED
+MAGENTA = Fore.MAGENTA
+
 
 def is_jira_issue(string):
     """Returns True if input string is a valid JIRA issue key, else False"""
@@ -53,9 +60,9 @@ def map(project, tags, is_interactive):
     # print the status
     styled_log = get_styled_log(project, tags)
     if jira_issue is None:
-        click.echo(f'{styled_log} {Fore.RED}unresolved{Fore.RESET}')
+        click.echo(f'{styled_log} {RED}unresolved{RESET}')
     else:
-        click.echo(f'{styled_log} {Fore.GREEN}{jira_issue}{Fore.RESET}')
+        click.echo(f'{styled_log} {GREEN}{jira_issue}{RESET}')
 
     # interact with user
     if is_interactive and jira_issue is None:
@@ -67,10 +74,10 @@ def map(project, tags, is_interactive):
 
 
 def get_styled_log(project, tags):
-    out = Fore.MAGENTA + f'{project}'
-    tag_delimeter = f'{Fore.RESET},{Fore.BLUE} '
+    out = MAGENTA + f'{project}'
+    tag_delimeter = f'{RESET},{BLUE} '
     if len(tags):
-        out += f'  {Fore.RESET}[{Fore.BLUE}{tag_delimeter.join(tags)}{Fore.RESET}]'
+        out += f'  {RESET}[{BLUE}{tag_delimeter.join(tags)}{RESET}]'
     return out
 
 
