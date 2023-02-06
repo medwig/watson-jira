@@ -42,7 +42,7 @@ def sync_logs(logs):
     if not logs:
         click.echo('No logs')
     else:
-        click.echo(YELLOW + '\nSyncing to JIRA')
+        click.echo(f'\n{YELLOW}Syncing to JIRA')
 
     for log in logs:
         started_datetime = parse(log['started'])
@@ -60,10 +60,10 @@ def sync_logs(logs):
                 for wl in worklogs
             ]
         ):
-            click.echo(YELLOW + 'already exists')
+            click.echo(f'{YELLOW}already exists')
         else:
             jira.add_worklog(**log)
-            click.echo(GREEN + 'synced')
+            click.echo(f'{GREEN}synced')
 
     return True
 
@@ -83,12 +83,12 @@ def jira_connect():
 
             return True
     except config.ConfigException as e:
-        click.echo(RED + f'Configuration error: {e}')
-        click.echo(LIGHTBLACK_EX + "You can try to run 'watson-jira init'")
+        click.echo(f'{RED}Configuration error: {e}')
+        click.echo(f"{LIGHTBLACK_EX}You can try to run 'watson-jira init'")
     except jira.JiraException as e:
-        click.echo(RED + f'JIRA error: {e}')
+        click.echo(f'{RED}JIRA error: {e}')
     except Exception as e:
-        click.echo(RED + f'Unknown error: {e}')
+        click.echo(f'{RED}Unknown error: {e}')
 
     return False
 
@@ -99,10 +99,7 @@ def check_connection():
         current_user = jira.test_conn()
         if current_user:
             click.echo(GREEN + f'Connected as {current_user}')
-            click.echo(
-                LIGHTBLACK_EX
-                + f'Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)'
-            )
+            click.echo(f'{LIGHTBLACK_EX}Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)')
             return True
     except Exception:
         pass
@@ -139,7 +136,7 @@ def sync(**kwargs):
         datelist = [date]
 
     for date in datelist:
-        click.echo('\n' + CYAN + f'{date}')
+        click.echo(f'\n{CYAN}{date}')
         logs = watson.log_day(
             date, tempo_format=True, is_interactive=is_interactive
         )
@@ -148,7 +145,7 @@ def sync(**kwargs):
 
         sync_logs(logs)
 
-    click.echo(CYAN + '\nSynchronization finished\n' + RESET)
+    click.echo(f'\n{CYAN}Synchronization finished{RESET}\n')
 
 
 @main.command()
@@ -170,7 +167,7 @@ def delete(**kwargs):
 
     worklogs = jira.get_worklogs(issue)
     click.echo(
-        YELLOW + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
+        f'\n{YELLOW}Deleting {len(worklogs)} worklogs from Jira issue {issue}'
     )
     for wl in worklogs:
         if is_interactive:
@@ -184,7 +181,7 @@ def delete(**kwargs):
         else:
             jira.delete_worklog(issue, wl['id'])
 
-    click.echo(CYAN + '\nDeletion Finished \n' + RESET)
+    click.echo(f'\n{CYAN}Deletion Finished{RESET}\n')
 
 
 @main.command()
@@ -241,26 +238,24 @@ Your selection{RESET}""",
 
     if auth_method == 0:
         data['jira']['personalAccessToken'] = click.prompt(
-            BLUE + 'Personal access token', type=str
+            f'{BLUE}Personal access token', type=str
         )
     elif auth_method == 1:
         data['jira']['email'] = click.prompt(BLUE + 'Jira email', type=str)
         click.echo(
-            LIGHTBLACK_EX
-            + 'Create token at https://id.atlassian.com/manage/api-tokens#'
+            f'{LIGHTBLACK_EX}Create token at https://id.atlassian.com/manage/api-tokens#'
         )
-        data['jira']['apiToken'] = click.prompt(BLUE + 'Api token', type=str)
+        data['jira']['apiToken'] = click.prompt(f'{BLUE}Api token', type=str)
     elif auth_method == 2:
         click.echo(
-            LIGHTBLACK_EX
-            + "In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
+            f"{LIGHTBLACK_EX}In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
         )
-        cookie = click.prompt(BLUE + 'Cookie', type=str)
+        cookie = click.prompt(f'{BLUE}Cookie', type=str)
         if cookie.startswith('Cookie: '):
             cookie = cookie[cookie.find(' ') + 1 :]
         data['jira']['cookie'] = cookie
     else:
-        click.echo(RED + f'Invalid value')
+        click.echo(f'{RED}Invalid value')
         return
 
     data['mappings'] = []
@@ -270,8 +265,7 @@ Your selection{RESET}""",
 
     if not check_connection():
         click.echo(
-            RED
-            + "Unable to fetch user's Jira display name with provided configuration!"
+            f"{RED}Unable to fetch user's Jira display name with provided configuration!"
         )
 
 
