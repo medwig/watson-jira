@@ -195,8 +195,6 @@ def delete(**kwargs):
 )
 @click.option('--id', default=None, help='get specific worklog by id')
 def tempo(**kwargs):
-    if not jira_connect():
-        return
     issue = kwargs['issue']
     _id = kwargs['id']
     if _id:
@@ -263,7 +261,6 @@ Your selection{RESET}""",
     data['mappings'] = []
 
     config.set(data)
-    jira.invalidate()
 
     if not check_connection():
         click.echo(
