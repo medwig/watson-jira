@@ -50,12 +50,6 @@ def get_worklog(issue, _id):
     return wl
 
 
-def delete_worklog(issue, id):
-    jira_conn = connect()
-    worklog = jira_conn.worklog(issue, id)
-    worklog.delete()
-
-
 def get_worklogs(issue, as_dict=False):
     jira_conn = connect()
     worklogs = jira_conn.worklogs(issue)

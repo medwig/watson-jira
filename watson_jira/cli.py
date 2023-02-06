@@ -145,14 +145,14 @@ def delete(**kwargs):
     for wl in worklogs:
         if is_interactive:
             click.echo(
-                f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
+                f"Delete worklog {wl.id} from {wl.started} for {wl.timeSpent}?"
             )
             if click.confirm('Continue?'):
-                jira.delete_worklog(issue, wl['id'])
+                wl.delete()
             else:
                 click.echo('Skipping')
         else:
-            jira.delete_worklog(issue, wl['id'])
+            wl.delete()
 
     click.echo(f'\n{CYAN}Deletion Finished{RESET}\n')
 
