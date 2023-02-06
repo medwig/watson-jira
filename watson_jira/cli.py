@@ -31,14 +31,14 @@ def dates_from(days_ago):
 
 def sync_logs(logs):
     if not logs:
-        print('No logs')
+        click.echo('No logs')
     else:
-        print(Fore.YELLOW + '\nSyncing to JIRA')
+        click.echo(Fore.YELLOW + '\nSyncing to JIRA')
 
     for log in logs:
         started_datetime = parse(log['started'])
         started_formatted = started_datetime.strftime('%H:%M')
-        print(
+        click.echo(
             f"{Fore.BLUE}{log['issue']}{Fore.RESET} at {Fore.GREEN}{started_formatted}{Fore.RESET} {log['timeSpent']}m ",
             end='',
         )
@@ -51,10 +51,10 @@ def sync_logs(logs):
                 for wl in worklogs
             ]
         ):
-            print(Fore.YELLOW + 'already exists')
+            click.echo(Fore.YELLOW + 'already exists')
         else:
             jira.add_worklog(**log)
-            print(Fore.GREEN + 'synced')
+            click.echo(Fore.GREEN + 'synced')
 
     return True
 
@@ -64,13 +64,13 @@ def jira_connect():
         connection_info = jira.connect()
         if connection_info:
             (server, auth_method) = connection_info
-            print(f'Connecting to {server}')
+            click.echo(f'Connecting to {server}')
             if auth_method == 'pat':
-                print('Using personal access token auth method')
+                click.echo('Using personal access token auth method')
             elif auth_method == 'apiToken':
-                print('Using email with API token auth method')
+                click.echo('Using email with API token auth method')
             else:
-                print('Using cookie auth method')
+                click.echo('Using cookie auth method')
 
             return True
     except config.ConfigException as e:
@@ -132,8 +132,7 @@ def sync(**kwargs):
         datelist = [date]
 
     for date in datelist:
-        print()
-        print(Fore.CYAN + Style.NORMAL + f'{date}')
+        click.echo('\n' + Fore.CYAN + Style.NORMAL + f'{date}')
         logs = watson.log_day(
             date, tempo_format=True, is_interactive=is_interactive
         )
@@ -142,7 +141,7 @@ def sync(**kwargs):
 
         sync_logs(logs)
 
-    print(Fore.CYAN + '\nSynchronization finished\n' + Fore.RESET)
+    click.echo(Fore.CYAN + '\nSynchronization finished\n' + Fore.RESET)
 
 
 @main.command()
@@ -163,7 +162,7 @@ def delete(**kwargs):
     is_interactive = kwargs['interactive']
 
     worklogs = jira.get_worklogs(issue)
-    print(
+    click.echo(
         Fore.YELLOW
         + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
     )
@@ -179,7 +178,7 @@ def delete(**kwargs):
         else:
             jira.delete_worklog(issue, wl['id'])
 
-    print(Fore.CYAN + '\nDeletion Finished \n' + Fore.RESET)
+    click.echo(Fore.CYAN + '\nDeletion Finished \n' + Fore.RESET)
 
 
 @main.command()
