@@ -143,12 +143,6 @@ mappings:
 
 `$ watson-jira sync --from 3 --interactive`
 
-#### Delete Jira tempo logs for an issue
-
-`$ watson-jira delete --issue FOO-1`
-
-Note that this will delete all Jira worklogs for the issue, not just the ones synced by Watson-Jira. It will _not_ delete any Watson logs, Watson-Jira is readonly for Watson logs.
-
 #### Help
 
 `$ watson-jira --help`
