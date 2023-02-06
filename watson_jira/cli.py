@@ -26,6 +26,7 @@ RED = Fore.RED
 LIGHTBLACK_EX = Fore.LIGHTBLACK_EX
 CYAN = Fore.CYAN
 
+
 def to_ymd(datestring):
     return datestring.split('T')[0]
 
@@ -83,9 +84,7 @@ def jira_connect():
             return True
     except config.ConfigException as e:
         click.echo(RED + f'Configuration error: {e}')
-        click.echo(
-            LIGHTBLACK_EX + "You can try to run 'watson-jira init'"
-        )
+        click.echo(LIGHTBLACK_EX + "You can try to run 'watson-jira init'")
     except jira.JiraException as e:
         click.echo(RED + f'JIRA error: {e}')
     except Exception as e:
@@ -171,8 +170,7 @@ def delete(**kwargs):
 
     worklogs = jira.get_worklogs(issue)
     click.echo(
-        YELLOW
-        + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
+        YELLOW + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
     )
     for wl in worklogs:
         if is_interactive:
@@ -191,7 +189,10 @@ def delete(**kwargs):
 
 @main.command()
 @click.option(
-    '--issue', default=None, required=True, help='get Jira worklogs for this issue'
+    '--issue',
+    default=None,
+    required=True,
+    help='get Jira worklogs for this issue',
 )
 @click.option('--id', default=None, help='get specific worklog by id')
 def tempo(**kwargs):
@@ -226,9 +227,7 @@ def init(**kwargs):
 
     data = {}
     data['jira'] = {}
-    data['jira']['server'] = click.prompt(
-        BLUE + 'Jira server URL', type=str
-    )
+    data['jira']['server'] = click.prompt(BLUE + 'Jira server URL', type=str)
 
     auth_method = click.prompt(
         f"""{BLUE}Jira authentication method
@@ -245,16 +244,12 @@ Your selection{RESET}""",
             BLUE + 'Personal access token', type=str
         )
     elif auth_method == 1:
-        data['jira']['email'] = click.prompt(
-            BLUE + 'Jira email', type=str
-        )
+        data['jira']['email'] = click.prompt(BLUE + 'Jira email', type=str)
         click.echo(
             LIGHTBLACK_EX
             + 'Create token at https://id.atlassian.com/manage/api-tokens#'
         )
-        data['jira']['apiToken'] = click.prompt(
-            BLUE + 'Api token', type=str
-        )
+        data['jira']['apiToken'] = click.prompt(BLUE + 'Api token', type=str)
     elif auth_method == 2:
         click.echo(
             LIGHTBLACK_EX
