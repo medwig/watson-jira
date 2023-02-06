@@ -12,7 +12,6 @@ def connect():
     jiraconfig = config.jira()
     try:
         if jiraconfig['pat']:
-            auth_method = 'pat'
             headers = JIRA.DEFAULT_OPTIONS['headers'].copy()
             headers['Authorization'] = jiraconfig['pat']
             jira = JIRA(
@@ -20,12 +19,10 @@ def connect():
             )
 
         elif jiraconfig['apiToken']:
-            auth_method = 'apiToken'
             auth = (jiraconfig['email'], jiraconfig['apiToken'])
             jira = JIRA(server=jiraconfig['server'], basic_auth=auth)
 
         else:
-            auth_method = 'cookie'
             headers = JIRA.DEFAULT_OPTIONS['headers'].copy()
             headers['cookie'] = jiraconfig['cookie']
             jira = JIRA(
