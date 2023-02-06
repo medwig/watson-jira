@@ -68,21 +68,6 @@ def sync_logs(logs):
     return None
 
 
-def check_connection():
-    try:
-        jira.connect()
-        current_user = jira.test_conn()
-        if current_user:
-            click.echo(GREEN + f'Connected as {current_user}')
-            click.echo(
-                f'{LIGHTBLACK_EX}Please make sure to define mappings in the config file (default in ~/.config/watson-jira/)'
-            )
-            return True
-    except Exception:
-        pass
-    return False
-
-
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option(version='1.0.0')
 def main():
@@ -190,7 +175,8 @@ def logs(**kwargs):
     '--clean-existing', is_flag=True, help='override existing config'
 )
 def init(**kwargs):
-    if not kwargs['clean_existing'] and check_connection():
+    if not kwargs['clean_existing'] and jira.get_user():
+        click.echo(f'\n{GREEN}done')
         return
 
     data = {}
@@ -233,10 +219,12 @@ Your selection{RESET}""",
 
     config.set(data)
 
-    if not check_connection():
+    current_user = jira.get_user()
+    if not current_user:
         click.echo(
             f"{RED}Unable to fetch user's Jira display name with provided configuration!"
         )
+    click.echo(GREEN + f'Connected as {current_user}')
 
 
 if __name__ == '__main__':
