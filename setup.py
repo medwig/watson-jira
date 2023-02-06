@@ -26,7 +26,7 @@ setup(
     install_requires=[
         'td-watson',
         'python-dateutil',
-        'click >=7.0,<8.0',
+        'click==8.1.3',
         'simplejson',
         'colorama',
         'jira',
