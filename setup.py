@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='watson_jira',
-    version='0.3.0',
+    version='0.4.0',
     description='Format and upload Watson time logs to Jira as Tempo worklogs',
     long_description=readme(),
     long_description_content_type='text/markdown',
@@ -26,7 +26,7 @@ setup(
     install_requires=[
         'td-watson',
         'python-dateutil',
-        'click >=7.0,<8.0',
+        'click==8.1.3',
         'simplejson',
         'colorama',
         'jira',
