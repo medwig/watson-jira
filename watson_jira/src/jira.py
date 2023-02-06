@@ -37,9 +37,9 @@ def connect():
         raise JiraException('Connection failed')
 
 
-def worklog_to_dict(worklog):
+def worklog_to_dict(worklog, issue):
     return {
-        'issue': worklog.issue,
+        'issue': issue,
         'comment': getattr(worklog, 'comment', None),
         'started': worklog.started,
         'timeSpent': worklog.timeSpent,
@@ -50,7 +50,7 @@ def get_worklog(issue, _id, as_dict=False):
     jira_conn = connect()
     worklog = jira_conn.worklog(issue, _id)
     if as_dict:
-        worklog_to_dict(worklog)
+        worklog_to_dict(worklog, issue)
     return worklog
 
 
@@ -58,7 +58,7 @@ def get_worklogs(issue, as_dict=False):
     jira_conn = connect()
     worklogs = jira_conn.worklogs(issue)
     if as_dict:
-        return [worklog_to_dict(worklog) for worklog in worklogs]
+        return [worklog_to_dict(worklog, issue) for worklog in worklogs]
     return worklogs
 
 
