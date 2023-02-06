@@ -52,11 +52,11 @@ def sync_logs(logs):
             nl=False,
         )
 
-        worklogs = jira.get_worklogs(log['issue'], as_dict=True)
+        worklogs = jira.get_worklogs(log['issue'])
         if any(
             [
-                log['comment'] == wl['comment']
-                and started_datetime.date() == parse(wl['started']).date()
+                log['comment'] == wl.comment
+                and started_datetime.date() == parse(wl.started).date()
                 for wl in worklogs
             ]
         ):
@@ -65,7 +65,7 @@ def sync_logs(logs):
             jira.add_worklog(**log)
             click.echo(f'{GREEN}synced')
 
-    return True
+    return None
 
 
 def check_connection():
@@ -169,10 +169,10 @@ def tempo(**kwargs):
     issue = kwargs['issue']
     _id = kwargs['id']
     if _id:
-        worklogs = jira.get_worklog(issue, _id)
+        wl = jira.get_worklog(issue, _id, as_dict=True)
     else:
-        worklogs = jira.get_worklogs(issue, as_dict=True)
-    click.echo(simplejson.dumps(worklogs, skipkeys=True))
+        wl = jira.get_worklogs(issue, as_dict=True)
+    click.echo(simplejson.dumps(wl, skipkeys=True))
 
 
 @main.command()
