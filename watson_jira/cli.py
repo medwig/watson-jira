@@ -52,7 +52,7 @@ def sync_logs(logs):
             nl=False,
         )
 
-        worklogs = jira.get_worklogs(log['issue'])
+        worklogs = jira.get_worklogs(log['issue'], as_dict=True)
         if any(
             [
                 log['comment'] == wl['comment']
@@ -171,7 +171,7 @@ def tempo(**kwargs):
     if _id:
         worklogs = jira.get_worklog(issue, _id)
     else:
-        worklogs = jira.get_worklogs(issue)
+        worklogs = jira.get_worklogs(issue, as_dict=True)
     click.echo(simplejson.dumps(worklogs, skipkeys=True))
 
 

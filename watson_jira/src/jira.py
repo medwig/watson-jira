@@ -56,19 +56,21 @@ def delete_worklog(issue, id):
     worklog.delete()
 
 
-def get_worklogs(issue):
+def get_worklogs(issue, as_dict=False):
     jira_conn = connect()
     worklogs = jira_conn.worklogs(issue)
-    parsed_worklogs = [
-        {
-            'issue': issue,
-            'comment': getattr(worklog, 'comment', None),
-            'started': worklog.started,
-            'timeSpent': worklog.timeSpent,
-            'id': worklog.id,
-        } for worklog in worklogs
-    ]
-    return parsed_worklogs
+    if as_dict:
+        parsed_worklogs = [
+            {
+                'issue': issue,
+                'comment': getattr(worklog, 'comment', None),
+                'started': worklog.started,
+                'timeSpent': worklog.timeSpent,
+                'id': worklog.id,
+            } for worklog in worklogs
+        ]
+        return parsed_worklogs
+    return worklogs
 
 
 def add_worklog(issue, timeSpent, comment, started):

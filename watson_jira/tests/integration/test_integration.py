@@ -30,7 +30,7 @@ class JiraHandler:
     @staticmethod
     def get_worklogs(issue):
         watson_jira.src.jira.connect()
-        worklogs = watson_jira.src.jira.get_worklogs(issue)
+        worklogs = watson_jira.src.jira.get_worklogs(issue, as_dict=True)
         print('Worklogs: ', worklogs)
         return worklogs
 
