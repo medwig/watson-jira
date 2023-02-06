@@ -55,8 +55,8 @@ def sync_logs(logs):
         worklogs = jira.get_worklogs(log['issue'])
         if any(
             [
-                log['comment'] == wl['comment']
-                and started_datetime.date() == parse(wl['started']).date()
+                log['comment'] == wl.comment
+                and started_datetime.date() == parse(wl.started).date()
                 for wl in worklogs
             ]
         ):
@@ -65,7 +65,7 @@ def sync_logs(logs):
             jira.add_worklog(**log)
             click.echo(f'{GREEN}synced')
 
-    return True
+    return None
 
 
 def check_connection():
@@ -145,14 +145,14 @@ def delete(**kwargs):
     for wl in worklogs:
         if is_interactive:
             click.echo(
-                f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
+                f'Delete worklog {wl.id} from {wl.started} for {wl.timeSpent}?'
             )
             if click.confirm('Continue?'):
-                jira.delete_worklog(issue, wl['id'])
+                wl.delete()
             else:
                 click.echo('Skipping')
         else:
-            jira.delete_worklog(issue, wl['id'])
+            wl.delete()
 
     click.echo(f'\n{CYAN}Deletion Finished{RESET}\n')
 
@@ -169,10 +169,10 @@ def tempo(**kwargs):
     issue = kwargs['issue']
     _id = kwargs['id']
     if _id:
-        worklogs = jira.get_worklog(issue, _id)
+        wl = jira.get_worklog(issue, _id, as_dict=True)
     else:
-        worklogs = jira.get_worklogs(issue)
-    click.echo(simplejson.dumps(worklogs, skipkeys=True))
+        wl = jira.get_worklogs(issue, as_dict=True)
+    click.echo(simplejson.dumps(wl, skipkeys=True))
 
 
 @main.command()

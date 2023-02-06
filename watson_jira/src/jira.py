@@ -12,7 +12,6 @@ def connect():
     jiraconfig = config.jira()
     try:
         if jiraconfig['pat']:
-            auth_method = 'pat'
             headers = JIRA.DEFAULT_OPTIONS['headers'].copy()
             headers['Authorization'] = jiraconfig['pat']
             jira = JIRA(
@@ -20,12 +19,10 @@ def connect():
             )
 
         elif jiraconfig['apiToken']:
-            auth_method = 'apiToken'
             auth = (jiraconfig['email'], jiraconfig['apiToken'])
             jira = JIRA(server=jiraconfig['server'], basic_auth=auth)
 
         else:
-            auth_method = 'cookie'
             headers = JIRA.DEFAULT_OPTIONS['headers'].copy()
             headers['cookie'] = jiraconfig['cookie']
             jira = JIRA(
@@ -37,38 +34,30 @@ def connect():
         raise JiraException('Connection failed')
 
 
-def get_worklog(issue, _id):
-    jira_conn = connect()
-    worklog = jira_conn.worklog(issue, _id)
-    wl = {
+def worklog_to_dict(worklog, issue):
+    return {
         'issue': issue,
         'comment': getattr(worklog, 'comment', None),
         'started': worklog.started,
         'timeSpent': worklog.timeSpent,
         'id': worklog.id,
     }
-    return wl
 
 
-def delete_worklog(issue, id):
+def get_worklog(issue, _id, as_dict=False):
     jira_conn = connect()
-    worklog = jira_conn.worklog(issue, id)
-    worklog.delete()
+    worklog = jira_conn.worklog(issue, _id)
+    if as_dict:
+        worklog_to_dict(worklog, issue)
+    return worklog
 
 
-def get_worklogs(issue):
+def get_worklogs(issue, as_dict=False):
     jira_conn = connect()
     worklogs = jira_conn.worklogs(issue)
-    parsed_worklogs = [
-        {
-            'issue': issue,
-            'comment': getattr(worklog, 'comment', None),
-            'started': worklog.started,
-            'timeSpent': worklog.timeSpent,
-            'id': worklog.id,
-        } for worklog in worklogs
-    ]
-    return parsed_worklogs
+    if as_dict:
+        return [worklog_to_dict(worklog, issue) for worklog in worklogs]
+    return worklogs
 
 
 def add_worklog(issue, timeSpent, comment, started):
