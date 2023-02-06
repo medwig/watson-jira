@@ -111,13 +111,13 @@ def main():
 @main.command()
 @click.option('--date', default=None, help='date to sync logs')
 @click.option(
-    '--from', default=0, type=int, help='sync logs from this long ago'
+    '--from', default=0, type=int, help='sync logs from this many days ago'
 )
 @click.option('--issue', default=None, help='only sync logs for this issue')
 @click.option(
     '--interactive',
     is_flag=True,
-    help='enable propmts to confirm or change target issue',
+    help='enable prompts to confirm or change target issue',
 )
 def sync(**kwargs):
     if not jira_connect():
@@ -184,7 +184,7 @@ def delete(**kwargs):
 
 @main.command()
 @click.option(
-    '--issue', default=None, required=True, help='get worklogs from this issue'
+    '--issue', default=None, required=True, help='get Jira worklogs for this issue'
 )
 @click.option('--id', default=None, help='get specific worklog by id')
 def tempo(**kwargs):
@@ -200,9 +200,9 @@ def tempo(**kwargs):
 
 
 @main.command()
-@click.option('--date', default=TODAY_YMD, help='date to get logs')
+@click.option('--date', default=TODAY_YMD, help='date to get Watson logs')
 @click.option(
-    '--tempo-format', is_flag=True, help='format logs for tempo timesheet'
+    '--tempo-format', is_flag=True, help='format logs for tempo (Jira format)'
 )
 def logs(**kwargs):
     logs = watson.log_day(kwargs['date'], kwargs['tempo_format'])
@@ -269,7 +269,7 @@ Your selection{Fore.RESET}""",
     if not check_connection():
         click.echo(
             Fore.RED
-            + "Unable to fetch user's display name with provided configuration!"
+            + "Unable to fetch user's Jira display name with provided configuration!"
         )
 
 
