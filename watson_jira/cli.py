@@ -68,31 +68,6 @@ def sync_logs(logs):
     return True
 
 
-def jira_connect():
-    try:
-        connection_info = jira.connect()
-        if connection_info:
-            (server, auth_method) = connection_info
-            click.echo(f'Connecting to {server}')
-            if auth_method == 'pat':
-                click.echo('Using personal access token auth method')
-            elif auth_method == 'apiToken':
-                click.echo('Using email with API token auth method')
-            else:
-                click.echo('Using cookie auth method')
-
-            return True
-    except config.ConfigException as e:
-        click.echo(f'{RED}Configuration error: {e}')
-        click.echo(f"{LIGHTBLACK_EX}You can try to run 'watson-jira init'")
-    except jira.JiraException as e:
-        click.echo(f'{RED}JIRA error: {e}')
-    except Exception as e:
-        click.echo(f'{RED}Unknown error: {e}')
-
-    return False
-
-
 def check_connection():
     try:
         jira.connect()
@@ -126,8 +101,6 @@ def main():
     help='enable prompts to confirm or change target issue',
 )
 def sync(**kwargs):
-    if not jira_connect():
-        return
     days_ago = kwargs['from']
     date = kwargs['date']
     issue = kwargs['issue']
@@ -162,8 +135,6 @@ def sync(**kwargs):
     help='enable propmts to delete worklogs for target issue',
 )
 def delete(**kwargs):
-    if not jira_connect():
-        return
     issue = kwargs['issue']
     is_interactive = kwargs['interactive']
 
