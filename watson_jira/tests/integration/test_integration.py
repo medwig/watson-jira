@@ -10,20 +10,21 @@ from watson_jira import cli
 import watson_jira.src.jira
 
 # Skip integration tests if not running on GitHub Actions
-if not os.getenv("GITHUB_ACTIONS", "False").lower() == 'true':
-    pytest.skip("skipping integration tests", allow_module_level=True)
+if not os.getenv('GITHUB_ACTIONS', 'False').lower() == 'true':
+    pytest.skip('skipping integration tests', allow_module_level=True)
 
-FROM = "10:00"
-TO = "11:00"
+FROM = '10:00'
+TO = '11:00'
 TIME_SPENT = '1h'
-PROJECT = "WAT"
-ISSUE = "WAT-3"
-TAG_NAME = "IntegrationTest"
+PROJECT = 'WAT'
+ISSUE = 'WAT-3'
+TAG_NAME = 'IntegrationTest'
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='module')
 def runner():
     return CliRunner()
+
 
 class JiraHandler:
     @staticmethod
@@ -45,8 +46,8 @@ class JiraHandler:
             print('No worklogs to delete.')
             return None
         for worklog in worklogs:
-            print('Deleting worklog:', issue, worklog["id"])
-            JiraHandler.delete_worklog(issue, worklog["id"])
+            print('Deleting worklog:', issue, worklog['id'])
+            JiraHandler.delete_worklog(issue, worklog['id'])
         print('Worklogs deleted.')
 
 
@@ -60,25 +61,25 @@ class WatsonHandler:
             stderr=PIPE,
         )
         stdout, _ = process.communicate()
-        return stdout.decode("ascii").strip()
+        return stdout.decode('ascii').strip()
 
     @staticmethod
     def get_test_logs():
-        cmd = f"watson log -f {FROM} -t {TO} --json"
+        cmd = f'watson log -f {FROM} -t {TO} --json'
         logs = json.loads(WatsonHandler.run(cmd))
         test_logs = [
             log
             for log in logs
-            if log["project"] == PROJECT
-            and ISSUE in log["tags"]
-            and TAG_NAME in log["tags"]
+            if log['project'] == PROJECT
+            and ISSUE in log['tags']
+            and TAG_NAME in log['tags']
         ]
         print('Test logs: ', test_logs)
         return test_logs
 
     @staticmethod
     def create_test_log():
-        cmd = f"watson add -f {FROM} -t {TO} {PROJECT} +{ISSUE} +{TAG_NAME}"
+        cmd = f'watson add -f {FROM} -t {TO} {PROJECT} +{ISSUE} +{TAG_NAME}'
         WatsonHandler.run(cmd)
 
     @staticmethod
@@ -96,13 +97,13 @@ def test_sync_log_to_jira(runner):
     WatsonHandler.create_test_log()
 
     print('Running sync to Jira for issue ', ISSUE, '...')
-    result = runner.invoke(cli.main, ["sync", "--issue", ISSUE])
+    result = runner.invoke(cli.main, ['sync', '--issue', ISSUE])
     assert result.exit_code == 0
 
     worklogs = JiraHandler.get_worklogs(ISSUE)
     assert len(worklogs) == 1
-    assert worklogs[0]["timeSpent"] == TIME_SPENT
-    assert worklogs[0]["issue"] == ISSUE
+    assert worklogs[0]['timeSpent'] == TIME_SPENT
+    assert worklogs[0]['issue'] == ISSUE
 
     # clean up
     WatsonHandler.remove_test_logs()
@@ -115,5 +116,5 @@ def test_sync_log_to_jira(runner):
     assert JiraHandler.get_worklogs(ISSUE) == []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     test_sync_log_to_jira()
