@@ -43,6 +43,7 @@ def worklog_to_dict(worklog, issue):
         'id': worklog.id,
     }
 
+
 def get_worklog(issue, _id, as_dict=False):
     jira_conn = connect()
     worklog = jira_conn.worklog(issue, _id)

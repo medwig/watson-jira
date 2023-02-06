@@ -145,7 +145,7 @@ def delete(**kwargs):
     for wl in worklogs:
         if is_interactive:
             click.echo(
-                f"Delete worklog {wl.id} from {wl.started} for {wl.timeSpent}?"
+                f'Delete worklog {wl.id} from {wl.started} for {wl.timeSpent}?'
             )
             if click.confirm('Continue?'):
                 wl.delete()
