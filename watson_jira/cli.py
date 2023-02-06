@@ -80,6 +80,8 @@ def jira_connect():
         )
     except jira.JiraException as e:
         click.echo(Fore.RED + f'JIRA error: {e}')
+    except Exception as e:
+        click.echo(Fore.RED + f'Unknown error: {e}')
 
     return False
 
@@ -118,28 +120,29 @@ def main():
     help='enable propmts to confirm or change target issue',
 )
 def sync(**kwargs):
-    if jira_connect():
-        days_ago = kwargs['from']
-        date = kwargs['date']
-        issue = kwargs['issue']
-        is_interactive = kwargs['interactive']
+    if not jira_connect():
+        return
+    days_ago = kwargs['from']
+    date = kwargs['date']
+    issue = kwargs['issue']
+    is_interactive = kwargs['interactive']
 
-        datelist = dates_from(days_ago)
-        if date:  # specific date trumps a range
-            datelist = [date]
+    datelist = dates_from(days_ago)
+    if date:  # specific date trumps a range
+        datelist = [date]
 
-        for date in datelist:
-            print()
-            print(Fore.CYAN + Style.NORMAL + f'{date}')
-            logs = watson.log_day(
-                date, tempo_format=True, is_interactive=is_interactive
-            )
-            if issue:
-                logs = [l for l in logs if l['issue'] == issue]
+    for date in datelist:
+        print()
+        print(Fore.CYAN + Style.NORMAL + f'{date}')
+        logs = watson.log_day(
+            date, tempo_format=True, is_interactive=is_interactive
+        )
+        if issue:
+            logs = [l for l in logs if l['issue'] == issue]
 
-            sync_logs(logs)
+        sync_logs(logs)
 
-        print(Fore.CYAN + '\nSynchronization finished\n' + Fore.RESET)
+    print(Fore.CYAN + '\nSynchronization finished\n' + Fore.RESET)
 
 
 @main.command()
@@ -154,28 +157,29 @@ def sync(**kwargs):
     help='enable propmts to delete worklogs for target issue',
 )
 def delete(**kwargs):
-    if jira_connect():
-        issue = kwargs['issue']
-        is_interactive = kwargs['interactive']
+    if not jira_connect():
+        return
+    issue = kwargs['issue']
+    is_interactive = kwargs['interactive']
 
-        worklogs = jira.get_worklogs(issue)
-        print(
-            Fore.YELLOW
-            + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
-        )
-        for wl in worklogs:
-            if is_interactive:
-                click.echo(
-                    f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
-                )
-                if click.confirm('Continue?'):
-                    jira.delete_worklog(issue, wl['id'])
-                else:
-                    click.echo('Skipping')
-            else:
+    worklogs = jira.get_worklogs(issue)
+    print(
+        Fore.YELLOW
+        + f'\nDeleting {len(worklogs)} worklogs from Jira issue {issue}'
+    )
+    for wl in worklogs:
+        if is_interactive:
+            click.echo(
+                f"Delete worklog {wl['id']} from {wl['started']} for {wl['timeSpent']}?"
+            )
+            if click.confirm('Continue?'):
                 jira.delete_worklog(issue, wl['id'])
+            else:
+                click.echo('Skipping')
+        else:
+            jira.delete_worklog(issue, wl['id'])
 
-        print(Fore.CYAN + '\nDeletion Finished \n' + Fore.RESET)
+    print(Fore.CYAN + '\nDeletion Finished \n' + Fore.RESET)
 
 
 @main.command()
@@ -184,14 +188,15 @@ def delete(**kwargs):
 )
 @click.option('--id', default=None, help='get specific worklog by id')
 def tempo(**kwargs):
-    if jira_connect():
-        issue = kwargs['issue']
-        _id = kwargs['id']
-        if _id:
-            worklogs = jira.get_worklog(issue, _id)
-        else:
-            worklogs = jira.get_worklogs(issue)
-        click.echo(simplejson.dumps(worklogs, skipkeys=True))
+    if not jira_connect():
+        return
+    issue = kwargs['issue']
+    _id = kwargs['id']
+    if _id:
+        worklogs = jira.get_worklog(issue, _id)
+    else:
+        worklogs = jira.get_worklogs(issue)
+    click.echo(simplejson.dumps(worklogs, skipkeys=True))
 
 
 @main.command()
