@@ -105,4 +105,4 @@ def test_sync_log_to_jira(runner):
 
 
 if __name__ == '__main__':
-    test_sync_log_to_jira()
+    pass
