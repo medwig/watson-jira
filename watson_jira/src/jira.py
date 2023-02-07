@@ -1,7 +1,8 @@
 from dateutil.parser import parse
-from watson_jira.src import config
+
 from jira import JIRA
-from typing import Optional
+
+from watson_jira.src import config
 
 
 class JiraException(Exception):
@@ -60,12 +61,12 @@ def get_worklogs(issue, as_dict=False):
     return worklogs
 
 
-def add_worklog(issue, timeSpent, comment, started):
+def add_worklog(issue, time_spent, comment, started):
     jira_conn = connect()
-    wl = jira_conn.add_worklog(
-        issue, timeSpent=timeSpent, comment=comment, started=parse(started)
+    worklog = jira_conn.add_worklog(
+        issue, timeSpent=time_spent, comment=comment, started=parse(started)
     )
-    return wl
+    return worklog
 
 
 def get_user():

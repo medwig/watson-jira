@@ -1,3 +1,5 @@
+"""Maps Watson project and tags to JIRA issue key"""
+
 import re
 import click
 from colorama import Fore
@@ -39,7 +41,7 @@ def ask():
     return click.prompt('Specify jira issue (leave empty to skip)', default='')
 
 
-def map(project, tags, is_interactive):
+def map_issue(project, tags, is_interactive):
     mappings = config.mappings()
 
     # resolve jira issue from the tag

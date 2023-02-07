@@ -23,7 +23,7 @@ def logs_to_worklogs(logs, is_interactive):
     print(Fore.YELLOW + 'Mapping watson logs to JIRA tickets')
     worklogs = []
     for log in logs:
-        jira_issue = mapper.map(log['project'], log['tags'], is_interactive)
+        jira_issue = mapper.map_issue(log['project'], log['tags'], is_interactive)
         if jira_issue is None:
             continue
 
