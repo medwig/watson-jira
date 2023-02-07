@@ -14,8 +14,8 @@ def set_config(data):
     try:
         config_dir_path = BaseDirectory.save_config_path('watson-jira')
         path = os.path.join(config_dir_path, 'config.yaml')
-        stream = open(path, 'w')
-        yaml.safe_dump(data, stream)
+        with open(path, 'w', encoding='utf-8') as stream:
+            yaml.safe_dump(data, stream)
     except Exception:
         raise ConfigException('Failed to write config file')
 
@@ -23,15 +23,10 @@ def set_config(data):
 def get():
     try:
         config_dir_path = BaseDirectory.load_first_config('watson-jira')
-        if config_dir_path == None:
-            raise ConfigException('Failed to find config dir')
+        assert config_dir_path != None, 'Failed to find config dir'
         path = os.path.join(config_dir_path, 'config.yaml')
-        stream = open(path)
-    except Exception as exc:
-        raise ConfigException('Failed to open config file') from exc
-
-    try:
-        config = yaml.safe_load(stream)
+        with open(path) as f:
+            config = yaml.safe_load(f)
     except Exception as exc:
         raise ConfigException('Failed to parse config file') from exc
 
