@@ -69,7 +69,7 @@ def sync_logs(logs):
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
-@click.version_option(version='1.0.0')
+@click.version_option()
 def main():
     pass
 
