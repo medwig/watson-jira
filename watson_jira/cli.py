@@ -1,3 +1,5 @@
+"""Click CLI interface"""
+
 import json
 from datetime import date
 
@@ -13,7 +15,7 @@ from watson_jira.src import watson, jira, config
 
 colorama.init(autoreset=True)
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = {'help_option_names': ['-h', '--help']}
 TODAY = date.today()
 TODAY_YMD = TODAY.strftime('%Y-%m-%d')
 
@@ -54,18 +56,16 @@ def sync_logs(logs):
 
         worklogs = jira.get_worklogs(log['issue'])
         if any(
-            [
+            (
                 log['comment'] == wl.comment
                 and started_datetime.date() == parse(wl.started).date()
                 for wl in worklogs
-            ]
+            )
         ):
             click.echo(f'{YELLOW}already exists')
         else:
             jira.add_worklog(**log)
             click.echo(f'{GREEN}synced')
-
-    return None
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -127,17 +127,17 @@ def delete(**kwargs):
     click.echo(
         f'\n{YELLOW}Deleting {len(worklogs)} worklogs from Jira issue {issue}'
     )
-    for wl in worklogs:
+    for worklog in worklogs:
         if is_interactive:
             click.echo(
-                f'Delete worklog {wl.id} from {wl.started} for {wl.timeSpent}?'
+                f'Delete worklog {worklog.id} from {worklog.started} for {worklog.timeSpent}?'
             )
             if click.confirm('Continue?'):
-                wl.delete()
+                worklog.delete()
             else:
                 click.echo('Skipping')
         else:
-            wl.delete()
+            worklog.delete()
 
     click.echo(f'\n{CYAN}Deletion Finished{RESET}\n')
 
@@ -154,10 +154,10 @@ def tempo(**kwargs):
     issue = kwargs['issue']
     _id = kwargs['id']
     if _id:
-        wl = jira.get_worklog(issue, _id, as_dict=True)
+        output = jira.get_worklog(issue, _id, as_dict=True)
     else:
-        wl = jira.get_worklogs(issue, as_dict=True)
-    click.echo(simplejson.dumps(wl, skipkeys=True))
+        output = jira.get_worklogs(issue, as_dict=True)
+    click.echo(simplejson.dumps(output, skipkeys=True))
 
 
 @main.command()
@@ -217,7 +217,7 @@ Your selection{RESET}""",
 
     data['mappings'] = []
 
-    config.set(data)
+    config.set_config(data)
 
     current_user = jira.get_user()
     if not current_user:

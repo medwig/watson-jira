@@ -1,7 +1,10 @@
+"""Jira API connection and worklog handling"""
+
 from dateutil.parser import parse
-from watson_jira.src import config
+
 from jira import JIRA
-from typing import Optional
+
+from watson_jira.src import config
 
 
 class JiraException(Exception):
@@ -30,8 +33,8 @@ def connect():
             )
 
         return jira
-    except Exception:
-        raise JiraException('Connection failed')
+    except Exception as exc:
+        raise JiraException('Connection failed') from exc
 
 
 def worklog_to_dict(worklog, issue):
@@ -62,10 +65,10 @@ def get_worklogs(issue, as_dict=False):
 
 def add_worklog(issue, timeSpent, comment, started):
     jira_conn = connect()
-    wl = jira_conn.add_worklog(
+    worklog = jira_conn.add_worklog(
         issue, timeSpent=timeSpent, comment=comment, started=parse(started)
     )
-    return wl
+    return worklog
 
 
 def get_user():

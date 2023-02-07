@@ -1,4 +1,4 @@
-import json
+"""Integration tests on the cli"""
 
 from click.testing import CliRunner
 import pytest

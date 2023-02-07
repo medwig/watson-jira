@@ -1,6 +1,7 @@
+"""Integration test for syncing Watson logs to Jira Tempo worklogs"""
+
 import json
 import os
-from subprocess import Popen, PIPE
 
 from click.testing import CliRunner
 import pytest
@@ -26,27 +27,7 @@ def runner():
     return CliRunner()
 
 
-class JiraHandler:
-    @staticmethod
-    def delete_worklogs(issue):
-        worklogs = jira.get_worklogs(issue)
-        for worklog in worklogs:
-            print('Deleting worklog:', issue, worklog.id)
-            worklog.delete()
-
-
 class WatsonHandler:
-    @staticmethod
-    def run(cmd):
-        print('Running: ', cmd, '...')
-        process = Popen(
-            cmd.split(),
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-        stdout, _ = process.communicate()
-        return stdout.decode('ascii').strip()
-
     @staticmethod
     def get_test_logs():
         cmd = f'watson log -f {FROM} -t {TO} --json'
@@ -92,9 +73,9 @@ def test_sync_log_to_jira(runner):
     result = runner.invoke(cli.main, ['tempo', '--issue', ISSUE])
     worklogs = json.loads(result.output)
     assert len(worklogs) == 1
-    wl = worklogs[0]
-    assert wl['timeSpent'] == TIME_SPENT
-    assert wl['issue'] == ISSUE
+    worklog = worklogs[0]
+    assert worklog['timeSpent'] == TIME_SPENT
+    assert worklog['issue'] == ISSUE
 
     # clean up
     WatsonHandler.remove_test_logs()

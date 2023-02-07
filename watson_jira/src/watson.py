@@ -1,3 +1,5 @@
+"""Watson CLI commands and Watson log handling"""
+
 import json
 from subprocess import Popen, PIPE
 from datetime import datetime
@@ -7,12 +9,12 @@ from watson_jira.src import mapper
 
 
 def run(cmd):
-    process = Popen(
+    with Popen(
         cmd.split(),
         stdout=PIPE,
         stderr=PIPE,
-    )
-    stdout, _ = process.communicate()
+    ) as process:
+        stdout, _ = process.communicate()
     return stdout.decode('ascii').strip()
 
 
@@ -21,7 +23,7 @@ def logs_to_worklogs(logs, is_interactive):
     print(Fore.YELLOW + 'Mapping watson logs to JIRA tickets')
     worklogs = []
     for log in logs:
-        jira_issue = mapper.map(log['project'], log['tags'], is_interactive)
+        jira_issue = mapper.map_issue(log['project'], log['tags'], is_interactive)
         if jira_issue is None:
             continue
 
@@ -35,8 +37,8 @@ def logs_to_worklogs(logs, is_interactive):
     return worklogs
 
 
-def get_comment(id, project, tags):
-    return '{0}\n{1} - [{2}]'.format(id, project, ', '.join(tags))
+def get_comment(id_, project, tags):
+    return f'{id_}\n{project} - [{", ".join(tags)}]'
 
 
 def get_time_spent(start, stop):
