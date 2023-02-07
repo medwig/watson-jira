@@ -1,3 +1,5 @@
+"""Click CLI interface"""
+
 import json
 from datetime import date
 
@@ -13,7 +15,7 @@ from watson_jira.src import watson, jira, config
 
 colorama.init(autoreset=True)
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+CONTEXT_SETTINGS = {'help_option_names': ['-h', '--help']}
 TODAY = date.today()
 TODAY_YMD = TODAY.strftime('%Y-%m-%d')
 
