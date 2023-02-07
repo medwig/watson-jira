@@ -23,9 +23,9 @@ def set_config(data):
 def get():
     try:
         config_dir_path = BaseDirectory.load_first_config('watson-jira')
-        assert config_dir_path != None, 'Failed to find config dir'
+        assert config_dir_path is not None, 'Failed to find config dir'
         path = os.path.join(config_dir_path, 'config.yaml')
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             config = yaml.safe_load(f)
     except Exception as exc:
         raise ConfigException('Failed to parse config file') from exc
