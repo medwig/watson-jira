@@ -1,6 +1,7 @@
+"""Integration test for syncing Watson logs to Jira Tempo worklogs"""
+
 import json
 import os
-from subprocess import Popen, PIPE
 
 from click.testing import CliRunner
 import pytest
