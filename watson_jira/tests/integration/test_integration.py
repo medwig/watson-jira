@@ -28,12 +28,6 @@ def runner():
 
 class JiraHandler:
     @staticmethod
-    def delete_worklog(issue, worklog_id):
-        wl = jira.get_worklog(issue, worklog_id)
-        wl.delete()
-        print('Worklog deleted: ', issue, worklog_id)
-
-    @staticmethod
     def delete_worklogs(issue):
         worklogs = jira.get_worklogs(issue)
         for worklog in worklogs:
