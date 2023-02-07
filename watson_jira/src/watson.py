@@ -1,3 +1,5 @@
+"""Watson CLI commands and Watson log handling"""
+
 import json
 from subprocess import Popen, PIPE
 from datetime import datetime
@@ -7,12 +9,12 @@ from watson_jira.src import mapper
 
 
 def run(cmd):
-    process = Popen(
+    with Popen(
         cmd.split(),
         stdout=PIPE,
         stderr=PIPE,
-    )
-    stdout, _ = process.communicate()
+    ) as process:
+        stdout, stderr = process.communicate()
     return stdout.decode('ascii').strip()
 
 
