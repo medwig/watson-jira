@@ -7,7 +7,7 @@ import pytest
 
 from watson_jira import cli
 
-import watson_jira.src.jira
+import watson_jira.src.jira as jira
 
 # Skip integration tests if not running on GitHub Actions
 if not os.getenv('GITHUB_ACTIONS', 'False').lower() == 'true':
@@ -28,27 +28,17 @@ def runner():
 
 class JiraHandler:
     @staticmethod
-    def get_worklogs(issue):
-        worklogs = watson_jira.src.jira.get_worklogs(issue, as_dict=True)
-        print('Worklogs: ', worklogs)
-        return worklogs
-
-    @staticmethod
     def delete_worklog(issue, worklog_id):
-        wl = watson_jira.src.jira.get_worklog(issue, worklog_id)
+        wl = jira.get_worklog(issue, worklog_id)
         wl.delete()
         print('Worklog deleted: ', issue, worklog_id)
 
     @staticmethod
     def delete_worklogs(issue):
-        worklogs = JiraHandler.get_worklogs(issue)
-        if not worklogs:
-            print('No worklogs to delete.')
-            return None
+        worklogs = jira.get_worklogs(issue)
         for worklog in worklogs:
             print('Deleting worklog:', issue, worklog['id'])
-            JiraHandler.delete_worklog(issue, worklog['id'])
-        print('Worklogs deleted.')
+            worklog.delete()
 
 
 class WatsonHandler:
@@ -100,7 +90,7 @@ def test_sync_log_to_jira(runner):
     result = runner.invoke(cli.main, ['sync', '--issue', ISSUE])
     assert result.exit_code == 0
 
-    worklogs = JiraHandler.get_worklogs(ISSUE)
+    worklogs = jira.get_worklogs(ISSUE)
     assert len(worklogs) == 1
     assert worklogs[0]['timeSpent'] == TIME_SPENT
     assert worklogs[0]['issue'] == ISSUE
@@ -113,7 +103,7 @@ def test_sync_log_to_jira(runner):
     JiraHandler.delete_worklogs(ISSUE)
 
     assert WatsonHandler.get_test_logs() == []
-    assert JiraHandler.get_worklogs(ISSUE) == []
+    assert jira.get_worklogs(ISSUE) == []
 
 
 if __name__ == '__main__':
