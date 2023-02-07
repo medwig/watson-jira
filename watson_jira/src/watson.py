@@ -14,7 +14,7 @@ def run(cmd):
         stdout=PIPE,
         stderr=PIPE,
     ) as process:
-        stdout, stderr = process.communicate()
+        stdout, _ = process.communicate()
     return stdout.decode('ascii').strip()
 
 
@@ -37,8 +37,8 @@ def logs_to_worklogs(logs, is_interactive):
     return worklogs
 
 
-def get_comment(id, project, tags):
-    return '{0}\n{1} - [{2}]'.format(id, project, ', '.join(tags))
+def get_comment(id_, project, tags):
+    return f'{id_}\n{project} - [{", ".join(tags)}]'
 
 
 def get_time_spent(start, stop):
