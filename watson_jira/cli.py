@@ -217,7 +217,7 @@ Your selection{RESET}""",
 
     data['mappings'] = []
 
-    config.set(data)
+    config.set_config(data)
 
     current_user = jira.get_user()
     if not current_user:

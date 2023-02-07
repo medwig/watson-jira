@@ -1,5 +1,8 @@
-import yaml
+"""Loads and parses the config file for watson-jira"""
+
 import os
+import yaml
+
 from xdg import BaseDirectory
 
 
@@ -10,7 +13,7 @@ class ConfigException(Exception):
 config = None
 
 
-def set(data):
+def set_config(data):
     global config
     try:
         config_dir_path = BaseDirectory.save_config_path('watson-jira')
@@ -31,13 +34,13 @@ def get():
                 raise ConfigException('Failed to find config dir')
             path = os.path.join(config_dir_path, 'config.yaml')
             stream = open(path)
-        except Exception:
-            raise ConfigException('Failed to open config file')
+        except Exception as exc:
+            raise ConfigException('Failed to open config file') from exc
 
         try:
             config = yaml.safe_load(stream)
-        except Exception:
-            raise ConfigException('Failed to parse config file')
+        except Exception as exc:
+            raise ConfigException('Failed to parse config file') from exc
 
     return config
 
