@@ -73,9 +73,9 @@ def test_sync_log_to_jira(runner):
     result = runner.invoke(cli.main, ['tempo', '--issue', ISSUE])
     worklogs = json.loads(result.output)
     assert len(worklogs) == 1
-    wl = worklogs[0]
-    assert wl['timeSpent'] == TIME_SPENT
-    assert wl['issue'] == ISSUE
+    worklog = worklogs[0]
+    assert worklog['timeSpent'] == TIME_SPENT
+    assert worklog['issue'] == ISSUE
 
     # clean up
     WatsonHandler.remove_test_logs()
