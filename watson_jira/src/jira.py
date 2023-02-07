@@ -1,3 +1,5 @@
+"""Jira API connection and worklog handling"""
+
 from dateutil.parser import parse
 
 from jira import JIRA
@@ -31,8 +33,8 @@ def connect():
             )
 
         return jira
-    except Exception:
-        raise JiraException('Connection failed')
+    except Exception as exc:
+        raise JiraException('Connection failed') from exc
 
 
 def worklog_to_dict(worklog, issue):
