@@ -37,17 +37,6 @@ class JiraHandler:
 
 class WatsonHandler:
     @staticmethod
-    def run(cmd):
-        print('Running: ', cmd, '...')
-        process = Popen(
-            cmd.split(),
-            stdout=PIPE,
-            stderr=PIPE,
-        )
-        stdout, _ = process.communicate()
-        return stdout.decode('ascii').strip()
-
-    @staticmethod
     def get_test_logs():
         cmd = f'watson log -f {FROM} -t {TO} --json'
         logs = json.loads(watson.run(cmd))
