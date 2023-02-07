@@ -7,7 +7,7 @@ import pytest
 
 from watson_jira import cli
 
-import watson_jira.src.jira as jira
+from watson_jira.src import jira, watson
 
 # Skip integration tests if not running on GitHub Actions
 if not os.getenv('GITHUB_ACTIONS', 'False').lower() == 'true':
@@ -50,7 +50,7 @@ class WatsonHandler:
     @staticmethod
     def get_test_logs():
         cmd = f'watson log -f {FROM} -t {TO} --json'
-        logs = json.loads(WatsonHandler.run(cmd))
+        logs = json.loads(watson.run(cmd))
         test_logs = [
             log
             for log in logs
@@ -64,14 +64,14 @@ class WatsonHandler:
     @staticmethod
     def create_test_log():
         cmd = f'watson add -f {FROM} -t {TO} {PROJECT} +{ISSUE} +{TAG_NAME}'
-        WatsonHandler.run(cmd)
+        watson.run(cmd)
 
     @staticmethod
     def remove_test_logs():
         test_logs = WatsonHandler.get_test_logs()
         for log in test_logs:
             cmd = f"watson remove -f {log['id']}"
-            WatsonHandler.run(cmd)
+            watson.run(cmd)
         print('Test logs removed.')
 
 
