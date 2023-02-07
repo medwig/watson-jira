@@ -31,7 +31,7 @@ class JiraHandler:
     def delete_worklogs(issue):
         worklogs = jira.get_worklogs(issue)
         for worklog in worklogs:
-            print('Deleting worklog:', issue, worklog['id'])
+            print('Deleting worklog:', issue, worklog.id)
             worklog.delete()
 
 
@@ -84,10 +84,11 @@ def test_sync_log_to_jira(runner):
     result = runner.invoke(cli.main, ['sync', '--issue', ISSUE])
     assert result.exit_code == 0
 
-    worklogs = jira.get_worklogs(ISSUE)
+    worklogs = jira.get_worklogs(ISSUE, as_dict=True)
     assert len(worklogs) == 1
-    assert worklogs[0]['timeSpent'] == TIME_SPENT
-    assert worklogs[0]['issue'] == ISSUE
+    wl = worklogs[0]
+    assert wl['timeSpent'] == TIME_SPENT
+    assert wl['issue'] == ISSUE
 
     # clean up
     WatsonHandler.remove_test_logs()
