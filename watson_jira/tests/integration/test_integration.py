@@ -76,15 +76,21 @@ class WatsonHandler:
 
 
 def test_sync_log_to_jira(runner):
-    # create fresh test logs
+    # clean slate
     WatsonHandler.remove_test_logs()
+    runner.invoke(cli.main, ['delete', '--issue', ISSUE])
+
+    # create test log
     WatsonHandler.create_test_log()
 
+    # sync log to Jira
     print('Running sync to Jira for issue ', ISSUE, '...')
     result = runner.invoke(cli.main, ['sync', '--issue', ISSUE])
     assert result.exit_code == 0
 
-    worklogs = jira.get_worklogs(ISSUE, as_dict=True)
+    # download log and confirm it was synced
+    result = runner.invoke(cli.main, ['tempo', '--issue', ISSUE])
+    worklogs = json.loads(result.output)
     assert len(worklogs) == 1
     wl = worklogs[0]
     assert wl['timeSpent'] == TIME_SPENT
@@ -92,10 +98,7 @@ def test_sync_log_to_jira(runner):
 
     # clean up
     WatsonHandler.remove_test_logs()
-    # for reasons unknown, using the cli runner here will do nothing, despite the exit code being 0
-    # in fact when running *any* cli commands here, only the first will execute
-    # so the library is used instead
-    JiraHandler.delete_worklogs(ISSUE)
+    runner.invoke(cli.main, ['delete', '--issue', ISSUE])
 
     assert WatsonHandler.get_test_logs() == []
     assert jira.get_worklogs(ISSUE) == []
