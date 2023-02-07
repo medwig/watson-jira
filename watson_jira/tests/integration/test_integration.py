@@ -27,15 +27,6 @@ def runner():
     return CliRunner()
 
 
-class JiraHandler:
-    @staticmethod
-    def delete_worklogs(issue):
-        worklogs = jira.get_worklogs(issue)
-        for worklog in worklogs:
-            print('Deleting worklog:', issue, worklog.id)
-            worklog.delete()
-
-
 class WatsonHandler:
     @staticmethod
     def get_test_logs():
