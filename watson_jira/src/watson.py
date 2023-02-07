@@ -6,6 +6,16 @@ from colorama import Fore
 from watson_jira.src import mapper
 
 
+def run(cmd):
+    process = Popen(
+        cmd.split(),
+        stdout=PIPE,
+        stderr=PIPE,
+    )
+    stdout, _ = process.communicate()
+    return stdout.decode('ascii').strip()
+
+
 def logs_to_worklogs(logs, is_interactive):
     """Convert Watson logs to Tempo (Jira) worklog dictionaries"""
     print(Fore.YELLOW + 'Mapping watson logs to JIRA tickets')
@@ -37,13 +47,8 @@ def get_time_spent(start, stop):
 
 def log_day(date, tempo_format=False, is_interactive=False):
     """Get Watson logs for given date in JSON"""
-    process = Popen(
-        ['watson', 'log', '--from', date, '--to', date, '--json'],
-        stdout=PIPE,
-        stderr=PIPE,
-    )
-    stdout, _ = process.communicate()
-    logs = json.loads(stdout.decode('ascii').strip())
+    cmd = f'watson log --from {date} --to {date} --json'
+    logs = json.loads(run(cmd))
     if tempo_format:
         logs = logs_to_worklogs(logs, is_interactive)
     return logs
