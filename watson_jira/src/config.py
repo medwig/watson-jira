@@ -16,8 +16,8 @@ def set_config(data):
         path = os.path.join(config_dir_path, 'config.yaml')
         with open(path, 'w', encoding='utf-8') as stream:
             yaml.safe_dump(data, stream)
-    except Exception:
-        raise ConfigException('Failed to write config file')
+    except Exception as exc:
+        raise ConfigException('Failed to write config file') from exc
 
 
 def get():
