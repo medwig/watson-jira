@@ -63,10 +63,10 @@ def get_worklogs(issue, as_dict=False):
     return worklogs
 
 
-def add_worklog(issue, time_spent, comment, started):
+def add_worklog(issue, timeSpent, comment, started):
     jira_conn = connect()
     worklog = jira_conn.add_worklog(
-        issue, timeSpent=time_spent, comment=comment, started=parse(started)
+        issue, timeSpent=timeSpent, comment=comment, started=parse(started)
     )
     return worklog
 

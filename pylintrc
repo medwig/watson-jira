@@ -185,6 +185,7 @@ good-names=i,
            f,
            ex,
            Run,
+           timeSpent,  # Jira worklog naming convention
            _
 
 # Good variable names regexes, separated by a comma. If names match any regex,
