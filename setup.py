@@ -7,6 +7,7 @@ def readme():
     with open('README.md', encoding='utf-8') as f:
         return f.read()
 
+
 def parse_requirements(requirements, ignore=('setuptools',)):
     """Read dependencies from requirements file (with version numbers if any)"""
     with open(requirements) as f:
@@ -22,6 +23,7 @@ def parse_requirements(requirements, ignore=('setuptools',)):
                 packages.add(pkg)
         return tuple(packages)
 
+
 setup(
     name='watson_jira',
     version='0.4.0',
@@ -35,8 +37,8 @@ setup(
         'Topic :: Office/Business :: Scheduling',
     ],
     url='http://github.com/medwig/watson-jira',
-    author="Jonathan Medwig",
-    author_email="jonmedwig@gmail.com",
+    author='Jonathan Medwig',
+    author_email='jonmedwig@gmail.com',
     license='MIT',
     packages=['watson_jira', 'watson_jira.src'],
     python_requires='>=3.6',
