@@ -7,6 +7,20 @@ def readme():
     with open('README.md', encoding='utf-8') as f:
         return f.read()
 
+def parse_requirements(requirements, ignore=('setuptools',)):
+    """Read dependencies from requirements file (with version numbers if any)"""
+    with open(requirements) as f:
+        packages = set()
+        for line in f:
+            line = line.strip()
+            if line.startswith(('#', '-r', '--')):
+                continue
+            if '#egg=' in line:
+                line = line.split('#egg=')[1]
+            pkg = line.strip()
+            if pkg not in ignore:
+                packages.add(pkg)
+        return tuple(packages)
 
 setup(
     name='watson_jira',
@@ -25,17 +39,9 @@ setup(
     author_email="jonmedwig@gmail.com",
     license='MIT',
     packages=['watson_jira', 'watson_jira.src'],
-    install_requires=[
-        'python-dateutil',
-        'click==8.1.3',
-        'simplejson',
-        'colorama',
-        'jira',
-        'pyyaml',
-        'pyxdg',
-    ],
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    python_requires='>=3.6',
+    install_requires=parse_requirements('requirements.txt'),
+    tests_require=parse_requirements('requirements-dev.txt'),
     entry_points={'console_scripts': ['watson-jira=watson_jira.cli:main']},
     zip_safe=False,
     include_package_data=True,

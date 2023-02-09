@@ -1,0 +1,7 @@
+python-dateutil
+click==8.1.3
+simplejson
+colorama
+jira
+pyyaml
+pyxdg
