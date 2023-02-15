@@ -174,7 +174,15 @@ def logs(**kwargs):
 @click.option(
     '--clean-existing', is_flag=True, help='override existing config'
 )
+@click.option(
+    '--show-config', is_flag=True, help='show current config file and exit'
+)
 def init(**kwargs):
+    if kwargs['show_config']:
+        current_config = config.load_config()
+        click.echo(json.dumps(current_config))
+        return
+
     if not kwargs['clean_existing'] and jira.get_user():
         click.echo(f'\n{GREEN}done')
         return
