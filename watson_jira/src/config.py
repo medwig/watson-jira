@@ -20,7 +20,7 @@ def set_config(data):
         raise ConfigException('Failed to write config file') from exc
 
 
-def get():
+def load_config():
     try:
         config_dir_path = BaseDirectory.load_first_config('watson-jira')
         assert config_dir_path is not None, 'Failed to find config dir'
@@ -34,14 +34,14 @@ def get():
 
 
 def mappings():
-    config = get()
+    config = load_config()
     if config is None or 'mappings' not in config:
         raise ConfigException('Config file must have `mappings` section')
     return config['mappings']
 
 
 def jira():
-    config = get()
+    config = load_config()
     if config is None or 'jira' not in config:
         raise ConfigException('Config file must have `jira` section')
 
