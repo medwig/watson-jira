@@ -68,6 +68,16 @@ def sync_logs(logs):
             click.echo(f'{GREEN}synced')
 
 
+def get_current_user():
+    current_user = jira.get_user()
+    if not current_user:
+        click.echo(
+            f"{RED}Unable to fetch user's Jira display name with provided configuration!"
+        )
+    click.echo(GREEN + f'Connected to Jira as {current_user}')
+    return
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option()
 def main():
@@ -192,7 +202,7 @@ def init(**kwargs):
         return
 
     if not kwargs['clean_existing'] and jira.get_user():
-        click.echo(f'\n{GREEN}done')
+        get_current_user()
         return
 
     data = {}
@@ -234,13 +244,7 @@ Your selection{RESET}""",
     data['mappings'] = []
 
     config.set_config(data)
-
-    current_user = jira.get_user()
-    if not current_user:
-        click.echo(
-            f"{RED}Unable to fetch user's Jira display name with provided configuration!"
-        )
-    click.echo(GREEN + f'Connected as {current_user}')
+    get_current_user()
 
 
 if __name__ == '__main__':
