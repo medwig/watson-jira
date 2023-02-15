@@ -33,7 +33,7 @@ def load_config():
     return config
 
 
-def mappings():
+def load_mappings():
     config = load_config()
     if config is None or 'mappings' not in config:
         raise ConfigException('Config file must have `mappings` section')
