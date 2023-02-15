@@ -12,7 +12,7 @@ class JiraException(Exception):
 
 
 def connect():
-    jiraconfig = config.jira()
+    jiraconfig = config.get_jira_config()
     try:
         if jiraconfig['pat']:
             headers = JIRA.DEFAULT_OPTIONS['headers'].copy()

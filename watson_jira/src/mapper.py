@@ -42,7 +42,7 @@ def ask():
 
 
 def map_issue(project, tags, is_interactive):
-    mappings = config.mappings()
+    mappings = config.get_mappings()
 
     # resolve jira issue from the tag
     jira_issue = None

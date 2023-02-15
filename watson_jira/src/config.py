@@ -33,14 +33,14 @@ def load_config():
     return config
 
 
-def load_mappings():
+def get_mappings():
     config = load_config()
     if config is None or 'mappings' not in config:
         raise ConfigException('Config file must have `mappings` section')
     return config['mappings']
 
 
-def jira():
+def get_jira_config():
     config = load_config()
     if config is None or 'jira' not in config:
         raise ConfigException('Config file must have `jira` section')
