@@ -45,7 +45,7 @@ def get_jira_config():
     if config is None or 'jira' not in config:
         raise ConfigException('Config file must have `jira` section')
 
-    jiraconfig = config['jira']
+    jira_config = config['jira']
     jira = {
         'server': None,
         'email': None,
@@ -55,30 +55,30 @@ def get_jira_config():
     }
 
     # Server must be specified
-    if 'server' not in jiraconfig:
+    if 'server' not in jira_config:
         raise ConfigException('JIRA server must be set')
 
-    jira['server'] = jiraconfig['server']
+    jira['server'] = jira_config['server']
 
     # Try to resolve personal access token
-    if 'personalAccessToken' in jiraconfig:
-        jira['pat'] = jiraconfig['personalAccessToken']
+    if 'personalAccessToken' in jira_config:
+        jira['pat'] = jira_config['personalAccessToken']
         return jira
 
     # Try to resolve email and API token
-    if 'email' in jiraconfig or 'apiToken' in jiraconfig:
-        if 'email' not in jiraconfig or 'apiToken' not in jiraconfig:
+    if 'email' in jira_config or 'apiToken' in jira_config:
+        if 'email' not in jira_config or 'apiToken' not in jira_config:
             raise ConfigException(
                 'Auth method with email and API token requires both to be set'
             )
 
-        jira['email'] = jiraconfig['email']
-        jira['apiToken'] = jiraconfig['apiToken']
+        jira['email'] = jira_config['email']
+        jira['apiToken'] = jira_config['apiToken']
         return jira
 
     # Try to resolve cookie
-    if 'cookie' in jiraconfig:
-        jira['cookie'] = jiraconfig['cookie']
+    if 'cookie' in jira_config:
+        jira['cookie'] = jira_config['cookie']
         return jira
 
     raise ConfigException('No authentication method configured')
