@@ -52,8 +52,10 @@ def map_issue(project, tags, is_interactive):
                 jira_issue = process_single_issue(mapping)
             elif mapping['type'] == 'issue_per_project':
                 jira_issue = process_issue_per_project(mapping, project)
-        else:   # default to issue_specified_in_tag
-            jira_issue = process_issue_specified_in_tag(tags)
+
+    # default to issue specified in tag
+    if not jira_issue:
+        jira_issue = process_issue_specified_in_tag(tags)
 
     # backward compatibility - resolve jira issue from project name
     if is_jira_issue(project):
