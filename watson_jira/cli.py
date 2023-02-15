@@ -207,7 +207,7 @@ def init(**kwargs):
     if not kwargs['clean_existing'] and get_current_user():
         return
 
-    click.echo(f'Creating Jira connection:\n')
+    click.echo('Creating Jira connection:\n')
 
     data = {}
     data['jira'] = {}
