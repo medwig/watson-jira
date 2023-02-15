@@ -175,12 +175,20 @@ def logs(**kwargs):
     '--clean-existing', is_flag=True, help='override existing config'
 )
 @click.option(
-    '--show-config', is_flag=True, help='show current config file and exit'
+    '--show-config', is_flag=True, help='print current config and exit'
+)
+@click.option(
+    '--show-config-file', is_flag=True, help='print the path to the config file and exit'
 )
 def init(**kwargs):
     if kwargs['show_config']:
         current_config = config.load_config()
         click.echo(json.dumps(current_config))
+        return
+
+    if kwargs['show_config_file']:
+        config_path = config.get_config_path()
+        click.echo(config_path)
         return
 
     if not kwargs['clean_existing'] and jira.get_user():

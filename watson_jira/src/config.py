@@ -10,6 +10,12 @@ class ConfigException(Exception):
     pass
 
 
+def get_config_path():
+    config_dir_path = BaseDirectory.load_first_config('watson-jira')
+    assert config_dir_path is not None, 'Failed to find config dir'
+    return os.path.join(config_dir_path, 'config.yaml')
+
+
 def set_config(data):
     try:
         config_dir_path = BaseDirectory.save_config_path('watson-jira')
@@ -22,10 +28,8 @@ def set_config(data):
 
 def load_config():
     try:
-        config_dir_path = BaseDirectory.load_first_config('watson-jira')
-        assert config_dir_path is not None, 'Failed to find config dir'
-        path = os.path.join(config_dir_path, 'config.yaml')
-        with open(path, encoding='utf-8') as f:
+        config_path = get_config_path()
+        with open(config_path, encoding='utf-8') as f:
             config = yaml.safe_load(f)
     except Exception as exc:
         raise ConfigException('Failed to parse config file') from exc
