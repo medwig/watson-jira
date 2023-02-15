@@ -31,6 +31,8 @@ def load_config():
         config_path = get_config_path()
         with open(config_path, encoding='utf-8') as f:
             config = yaml.safe_load(f)
+    except FileNotFoundError:
+        raise
     except Exception as exc:
         raise ConfigException('Failed to parse config file') from exc
 
