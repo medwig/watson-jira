@@ -55,10 +55,10 @@ def get_jira_config():
     }
 
     # Server must be specified
-    if 'server' not in jira_config:
-        raise ConfigException('JIRA server must be set')
-
-    jira['server'] = jira_config['server']
+    try:
+        jira['server'] = jira_config['server']
+    except KeyError as exc:
+        raise ConfigException('JIRA server must be set') from exc
 
     # Try to resolve personal access token
     if 'personalAccessToken' in jira_config:
@@ -67,14 +67,12 @@ def get_jira_config():
 
     # Try to resolve email and API token
     if 'email' in jira_config or 'apiToken' in jira_config:
-        if 'email' not in jira_config or 'apiToken' not in jira_config:
-            raise ConfigException(
-                'Auth method with email and API token requires both to be set'
-            )
-
-        jira['email'] = jira_config['email']
-        jira['apiToken'] = jira_config['apiToken']
-        return jira
+        try:
+            jira['email'] = jira_config['email']
+            jira['apiToken'] = jira_config['apiToken']
+            return jira
+        except KeyError as exc:
+            raise ConfigException('Auth via email and API token requires both to be set') from exc
 
     # Try to resolve cookie
     if 'cookie' in jira_config:
