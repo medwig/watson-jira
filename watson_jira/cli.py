@@ -68,6 +68,19 @@ def sync_logs(logs):
             click.echo(f'{GREEN}synced')
 
 
+def get_current_user():
+    try:
+        current_user = jira.get_user()
+    except FileNotFoundError:
+        return False
+    if not current_user:
+        click.echo(
+            f"{RED}Unable to fetch user's Jira display name with provided configuration!"
+        )
+    click.echo(GREEN + f'Connected to Jira as {current_user}')
+    return current_user
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.version_option()
 def main():
@@ -174,10 +187,27 @@ def logs(**kwargs):
 @click.option(
     '--clean-existing', is_flag=True, help='override existing config'
 )
+@click.option(
+    '--show-config', is_flag=True, help='print current config and exit'
+)
+@click.option(
+    '--show-config-file', is_flag=True, help='print the path to the config file and exit'
+)
 def init(**kwargs):
-    if not kwargs['clean_existing'] and jira.get_user():
-        click.echo(f'\n{GREEN}done')
+    if kwargs['show_config']:
+        current_config = config.load_config()
+        click.echo(json.dumps(current_config))
         return
+
+    if kwargs['show_config_file']:
+        config_path = config.get_config_path()
+        click.echo(config_path)
+        return
+
+    if not kwargs['clean_existing'] and get_current_user():
+        return
+
+    click.echo('Creating Jira connection:\n')
 
     data = {}
     data['jira'] = {}
@@ -200,12 +230,12 @@ Your selection{RESET}""",
     elif auth_method == 1:
         data['jira']['email'] = click.prompt(BLUE + 'Jira email', type=str)
         click.echo(
-            f'{LIGHTBLACK_EX}Create token at https://id.atlassian.com/manage/api-tokens#'
+            f'{YELLOW}Create token at https://id.atlassian.com/manage/api-tokens#'
         )
         data['jira']['apiToken'] = click.prompt(f'{BLUE}Api token', type=str)
     elif auth_method == 2:
         click.echo(
-            f"{LIGHTBLACK_EX}In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
+            f"{YELLOW}In browser open developer tools and Network tab.\nIf no request is visible, then refresh page.\nOpen details of any GET request, and copy 'Cookie' from the Request Headers section.\nIt's ok to paste also with 'Cookie: ' field name."
         )
         cookie = click.prompt(f'{BLUE}Cookie', type=str)
         if cookie.startswith('Cookie: '):
@@ -218,13 +248,7 @@ Your selection{RESET}""",
     data['mappings'] = []
 
     config.set_config(data)
-
-    current_user = jira.get_user()
-    if not current_user:
-        click.echo(
-            f"{RED}Unable to fetch user's Jira display name with provided configuration!"
-        )
-    click.echo(GREEN + f'Connected as {current_user}')
+    assert get_current_user()
 
 
 if __name__ == '__main__':
