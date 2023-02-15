@@ -10,7 +10,7 @@ def readme():
 
 def parse_requirements(requirements, ignore=('setuptools',)):
     """Read dependencies from requirements file (with version numbers if any)"""
-    with open(requirements) as f:
+    with open(requirements, encoding='utf-8') as f:
         packages = set()
         for line in f:
             line = line.strip()
